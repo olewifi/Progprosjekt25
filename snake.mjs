@@ -78,6 +78,9 @@ class TSnakeHead extends TSnakePart {
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
       bateIsEaten();
     }else{
+      /*for(let score = 1000; score > 100; score--){
+        scoreTxt += score; //scoreText = knyttet til Number
+      }*/
       /* Decrease the score if the snake head is not on a bait cell */
     }
     boardCellInfo.infoType = EBoardCellInfoType.Snake; // Set the cell to Snake
