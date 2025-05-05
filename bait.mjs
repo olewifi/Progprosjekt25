@@ -2,8 +2,8 @@
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
-import libSprite from "../../common/libs/libSprite_v2.mjs";
-import lib2D from "../../common/libs/lib2d_v2.mjs";
+import libSprite from "./libSprite_v2.mjs";
+import lib2D from "./lib2d_v2.mjs";
 import { GameProps, SheetData } from "./game.mjs";
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
 

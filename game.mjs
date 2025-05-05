@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
-import libSprite from "../../common/libs/libSprite_v2.mjs";
+import libSprite from "./libSprite_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
