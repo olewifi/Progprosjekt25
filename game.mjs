@@ -3,10 +3,11 @@
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
-import libSprite from "../../common/libs/libSprite_v2.mjs";
+import libSprite from "./libSprite_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
+import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
@@ -35,7 +36,8 @@ export const GameProps = {
   gameBoard: null,
   gameStatus: EGameStatus.Idle,
   snake: null,
-  bait: null
+  bait: null,
+  menu: null, 
 };
 
 //------------------------------------------------------------------------------------------
@@ -67,6 +69,7 @@ function loadGame() {
   cvs.height = GameBoardSize.Rows * SheetData.Head.height;
 
   GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
+  GameProps.menu = new TMenu(spcvs); 
 
   /* Create the game menu here */ 
 
@@ -76,6 +79,7 @@ function loadGame() {
   console.log("Game canvas is rendering!");
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
   console.log("Game canvas is updating!");
+
 }
 
 function drawGame() {
@@ -83,11 +87,17 @@ function drawGame() {
   spcvs.clearCanvas();
 
   switch (GameProps.gameStatus) {
+    case EGameStatus.Idle:
+      GameProps.menu.draw(); 
     case EGameStatus.Playing:
     case EGameStatus.Pause:
       GameProps.bait.draw();
       GameProps.snake.draw();
+      GameProps.menu.draw(); 
       break;
+    case EGameStatus.GameOver:
+      GameProps.menu.draw(); 
+      break; 
   }
   // Request the next frame
   requestAnimationFrame(drawGame);
@@ -99,6 +109,7 @@ function updateGame() {
     case EGameStatus.Playing:
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
+        GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
       }
       break;
