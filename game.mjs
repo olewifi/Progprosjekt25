@@ -35,6 +35,7 @@ export const GameProps = {
   gameBoard: null,
   gameStatus: EGameStatus.Idle,
   snake: null,
+  body: null,
   bait: null
 };
 
@@ -49,12 +50,18 @@ export function newGame() {
   gameSpeed = 4; // Reset game speed
 }
 
-export function bateIsEaten() {
+export function bateIsEaten() { //Activates when snake is over bait cell
 
-  console.log("Bait eaten!");
+console.log("Bait eaten!");
+GameProps.bait.update(); //oppdaterer bait cell til en ny plass
+
+  increaseGameSpeed(); // Increase gamespeed
+
+  //How to add body to snake
+
   /* Logic to increase the snake size and score when bait is eaten */
 
-  increaseGameSpeed(); // Increase game speed
+
 }
 
 
@@ -106,8 +113,10 @@ function updateGame() {
 }
 
 function increaseGameSpeed() {
-  /* Increase game speed logic here */
-  console.log("Increase game speed!");
+  /* Increase game speed */
+  gameSpeed += 0.5; //adding speed
+
+  console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
 }
 
 
