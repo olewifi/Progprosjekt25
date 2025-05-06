@@ -19,15 +19,32 @@ export class TMenu {
         //get position for button to be in the middle of the canvas
         const pos = new lib2d_v2.TPosition( aSpriteCanvas.canvas.width /2 - SheetData.Play.width /2, aSpriteCanvas.canvas.height /2-SheetData.Play.height /2); 
 
-        this.#spButtonPlay = new libSprite_v2.TSprite(aSpriteCanvas, SheetData.Play, pos ); //funker pos her?
+        this.#spButtonPlay = new libSprite_v2.TSpriteButton(aSpriteCanvas, SheetData.Play, pos ); 
+        this.#spButtonPlay.onClick = () => {
+            GameProps.gameStatus = EGameStatus.Playing; //Kan jeg gjøre det slik??
+        }
 
-        this.#spButtonPause = new libSprite_v2.TSprite(aSpriteCanvas, SheetData.Resume, pos ); 
+        this.#spButtonPause = new libSprite_v2.TSpriteButton(aSpriteCanvas, SheetData.Resume, pos ); 
 
-        pos.x = 30; //SPØR LÆRER OM Å HELLER ENDRE TIL DYNAMISK ELLER EI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        pos.x = 95; 
+        pos.y = 398; //Det funker men er det poenget at jeg kan gjøre dte slik??
+        this.#spButtonHome = new libSprite_v2.TSpriteButton(aSpriteCanvas, SheetData.Home, pos); 
+        this.#spButtonHome.onClick = () => {
+            GameProps.gameStatus = EGameStatus.Idle; //Kan jeg gjøre det slik?? må isåfall også ha newgame i game.mjs? og vil jeg egt ha onclick her??
+        }
+
+        pos.x = 645; 
+        pos.y = 398; //Det funker men er det poenget at jeg kan gjøre dte slik??
+        this.#spButtonRetry = new libSprite_v2.TSpriteButton(aSpriteCanvas, SheetData.Retry,pos); 
+        this.#spButtonRetry.onClick = () => {
+            GameProps.gameStatus = EGameStatus.Playing; //Kan jeg gjøre det slik??
+        }
+        pos.x = 30; 
         pos.y = 50; 
         this.#spButtonGameOver = new libSprite_v2.TSprite(aSpriteCanvas, SheetData.GameOver, pos );
-       
-
+        
+        
+    
     }
 
     draw(){

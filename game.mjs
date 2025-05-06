@@ -4,6 +4,7 @@
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
 import libSprite from "./libSprite_v2.mjs";
+import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
@@ -68,11 +69,12 @@ function loadGame() {
   cvs.width = GameBoardSize.Cols * SheetData.Head.width;
   cvs.height = GameBoardSize.Rows * SheetData.Head.height;
 
-  GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
+
+  GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
+ //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
-  /* Create the game menu here */ 
-
+  
   newGame(); // Call this function from the menu to start a new game, remove this line when the menu is ready
 
   requestAnimationFrame(drawGame);
@@ -89,6 +91,7 @@ function drawGame() {
   switch (GameProps.gameStatus) {
     case EGameStatus.Idle:
       GameProps.menu.draw(); 
+      break; 
     case EGameStatus.Playing:
     case EGameStatus.Pause:
       GameProps.bait.draw();
