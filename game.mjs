@@ -58,6 +58,7 @@ export function bateIsEaten() {
 
   console.log("Bait eaten!");
   /* Logic to increase the snake size and score when bait is eaten */
+  GameProps.bait.update(); 
 
   increaseGameSpeed(); // Increase game speed
 }
@@ -75,6 +76,8 @@ function loadGame() {
  //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
+  newGame(); 
+
   requestAnimationFrame(drawGame);
   //requestAnimationFrame(animateButton); 
   console.log("Game canvas is rendering!");
@@ -82,6 +85,7 @@ function loadGame() {
   console.log("Game canvas is updating!");
 
 }
+
 
 function drawGame() {
   // Clear the canvas
@@ -92,6 +96,10 @@ function drawGame() {
       GameProps.menu.draw();
       break; 
     case EGameStatus.Playing:
+      GameProps.bait.draw();
+      GameProps.snake.draw();
+      GameProps.menu.draw(); 
+      break; 
     case EGameStatus.Pause:
       GameProps.bait.draw();
       GameProps.snake.draw();

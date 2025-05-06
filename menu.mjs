@@ -54,7 +54,6 @@ export class TMenu {
       pos
     );
     this.#spButtonHome.onClick = () => {
-      newGame();
       GameProps.gameStatus = EGameStatus.Idle;
     };
 
@@ -66,7 +65,6 @@ export class TMenu {
       pos
     );
     this.#spButtonRetry.onClick = () => {
-      newGame();
       GameProps.gameStatus = EGameStatus.Playing;
     };
     pos.x = 30;
