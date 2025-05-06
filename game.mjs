@@ -9,12 +9,14 @@ import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
 import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
+import libSprite_v2 from "./libSprite_v2.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+
 const cvs = document.getElementById("cvs");
-const spcvs = new libSprite.TSpriteCanvas(cvs);
+const spcvs = new libSprite.TSpriteCanvas(cvs);; 
 let gameSpeed = 4; // Game speed multiplier;
 let hndUpdateGame = null;
 export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 };
@@ -60,7 +62,6 @@ export function bateIsEaten() {
   increaseGameSpeed(); // Increase game speed
 }
 
-
 //------------------------------------------------------------------------------------------
 //----------- functions -------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -74,10 +75,8 @@ function loadGame() {
  //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
-  
-  newGame(); // Call this function from the menu to start a new game, remove this line when the menu is ready
-
   requestAnimationFrame(drawGame);
+  //requestAnimationFrame(animateButton); 
   console.log("Game canvas is rendering!");
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
   console.log("Game canvas is updating!");
@@ -90,7 +89,7 @@ function drawGame() {
 
   switch (GameProps.gameStatus) {
     case EGameStatus.Idle:
-      GameProps.menu.draw(); 
+      GameProps.menu.draw();
       break; 
     case EGameStatus.Playing:
     case EGameStatus.Pause:
@@ -124,7 +123,6 @@ function increaseGameSpeed() {
   console.log("Increase game speed!");
 }
 
-
 //-----------------------------------------------------------------------------------------
 //----------- Event handlers --------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
@@ -146,6 +144,7 @@ function onKeyDown(event) {
     case " ":
       console.log("Space key pressed!");
       /* Pause the game logic here */
+      GameProps.menu.togglePause(); 
       
       break;
     default:
