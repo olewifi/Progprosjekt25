@@ -1,7 +1,6 @@
 "use strict";
 
 //Bugs
-//Pilene og hånden
 //mute button når man refresher siden
 
 //-----------------------------------------------------------------------------------------
@@ -77,14 +76,8 @@ export function bateIsEaten() {
   playSound(GameProps.sounds.food); 
 
   GameProps.bait.update(); 
-  GameProps.snake.addSnakePart(); 
   /* Logic to increase the snake size and score when bait is eaten */
-  //let newSegment = TSnake.Body[snake.Body.length - 1].clone(); // Clone the last segment of the snake
-  //let newSegment = new TSnakeBody[TSnake.Body.length - 1].clone(); // Clone the last segment of the snake
- // TSnakeBody.push(newSegment); // Add the new segment to the snake body
-
-  //Make snake bigger when eating the apple using the clone function found in the snake class libSprite_v2.mjs
-  //GameProps.snake.addSnakePart(); // Add a new part to the snake
+  GameProps.snake.addSnakePart(); 
 
   increaseGameSpeed(); // Increase game speed
 }
@@ -105,9 +98,9 @@ function loadGame() {
   //newGame(); 
 
   requestAnimationFrame(drawGame);
-  //requestAnimationFrame(animateButton); 
+  
   console.log("Game canvas is rendering!");
-  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
   console.log("Game canvas is updating!");
 
   //Loading sounds
@@ -150,7 +143,7 @@ function updateGame() {
     case EGameStatus.Playing:
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
-        GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
+       // GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
         playSound(GameProps.sounds.gameOver);
         GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
@@ -202,7 +195,7 @@ function onKeyDown(event) {
       
       break;
     default:
-      console.log(`Key pressed: "${event.key}"`);
+      console.log(`Key pressed: "${event.key}"`); 
   }
 }
 //-----------------------------------------------------------------------------------------

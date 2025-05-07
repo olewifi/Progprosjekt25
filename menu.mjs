@@ -78,7 +78,7 @@ export class TMenu {
     );
   }
 
-  draw() {
+  draw() { //Alle knapper har visable lik false og true, bruker dermed disse for å skjule knapper når de ikke er på skjermen
     switch (GameProps.gameStatus) {
       case EGameStatus.Idle:
         //this.#spButtonPlay.visible = true; //Viser play knappen når game er idle
@@ -106,8 +106,7 @@ export class TMenu {
         break;
       case EGameStatus.GameOver:
         this.#spButtonPause.visible = false; 
-        this.#spButtonPlay.visible = false;
-        this.#spButtonPlay.disable = true; 
+        this.#spButtonPlay.visible = true;
         this.#spButtonGameOver.draw();
         this.#spButtonHome.visible = true; 
         this.#spButtonHome.draw(); //Legge de inn som buttins i tilleg?? //home funker
@@ -119,7 +118,6 @@ export class TMenu {
     }
   }
 
-  //Alle knapper har disable og visable lik false og true
   togglePause() {
     if (GameProps.gameStatus === EGameStatus.Pause) {
       GameProps.gameStatus = EGameStatus.Playing;
