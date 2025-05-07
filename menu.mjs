@@ -85,6 +85,7 @@ export class TMenu {
         this.#spButtonPlay.draw();
         //this.#spButtonPlay.visible = false; 
         //this.#spButtonPlay.disable = true; 
+        this.#spButtonPause.visible = false; 
         break;
       case EGameStatus.Playing:
         playSound(GameProps.sounds.running); //Play musikk når game er i gang
@@ -93,6 +94,7 @@ export class TMenu {
         //this.#spButtonPlay.disable = true; 
         this.#spButtonHome.visible = false;
         this.#spButtonRetry.visible = false;
+        this.#spButtonPause.visible = false; 
         break;
       case EGameStatus.Pause:
         this.#spButtonPause.draw();
@@ -103,6 +105,7 @@ export class TMenu {
         this.#spButtonRetry.visible = false;
         break;
       case EGameStatus.GameOver:
+        this.#spButtonPause.visible = false; 
         this.#spButtonPlay.visible = false;
         this.#spButtonPlay.disable = true; 
         this.#spButtonGameOver.draw();
