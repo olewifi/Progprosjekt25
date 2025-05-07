@@ -81,19 +81,34 @@ export class TMenu {
   draw() {
     switch (GameProps.gameStatus) {
       case EGameStatus.Idle:
+        //this.#spButtonPlay.visible = true; //Viser play knappen når game er idle
         this.#spButtonPlay.draw();
+        //this.#spButtonPlay.visible = false; 
+        //this.#spButtonPlay.disable = true; 
         break;
       case EGameStatus.Playing:
         playSound(GameProps.sounds.running); //Play musikk når game er i gang
         //GameProps.sounds.running.play(); //Play musikk når game er i gang
+        this.#spButtonPlay.visible = false;
+        //this.#spButtonPlay.disable = true; 
+        this.#spButtonHome.visible = false;
+        this.#spButtonRetry.visible = false;
         break;
       case EGameStatus.Pause:
         this.#spButtonPause.draw();
         GameProps.sounds.running.pause(); //Pause musikk når pause
+        this.#spButtonPlay.visible = false;
+        //this.#spButtonPlay.disable = true; 
+        this.#spButtonHome.visible = false;
+        this.#spButtonRetry.visible = false;
         break;
       case EGameStatus.GameOver:
+        this.#spButtonPlay.visible = false;
+        this.#spButtonPlay.disable = true; 
         this.#spButtonGameOver.draw();
-        this.#spButtonHome.draw(); //Legge de inn som buttins i tilleg??
+        this.#spButtonHome.visible = true; 
+        this.#spButtonHome.draw(); //Legge de inn som buttins i tilleg?? //home funker
+        this.#spButtonRetry.visible = true;
         this.#spButtonRetry.draw(); //Legge de inn som buttins i tilleg??
         //playSound(GameProps.sounds.gameOver);
         GameProps.sounds.running.stop(); //Stopp musikk når game Oer

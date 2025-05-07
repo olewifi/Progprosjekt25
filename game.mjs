@@ -11,7 +11,7 @@ import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
 import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
-import { TSnake, EDirection } from "./snake.mjs";
+import { TSnake, EDirection, } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
 import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
 import libSprite_v2 from "./libSprite_v2.mjs";
@@ -77,10 +77,14 @@ export function bateIsEaten() {
   playSound(GameProps.sounds.food); 
 
   GameProps.bait.update(); 
+  GameProps.snake.addSnakePart(); 
   /* Logic to increase the snake size and score when bait is eaten */
+  //let newSegment = TSnake.Body[snake.Body.length - 1].clone(); // Clone the last segment of the snake
+  //let newSegment = new TSnakeBody[TSnake.Body.length - 1].clone(); // Clone the last segment of the snake
+ // TSnakeBody.push(newSegment); // Add the new segment to the snake body
 
   //Make snake bigger when eating the apple using the clone function found in the snake class libSprite_v2.mjs
-  GameProps.snake.addSnakePart(); // Add a new part to the snake
+  //GameProps.snake.addSnakePart(); // Add a new part to the snake
 
   increaseGameSpeed(); // Increase game speed
 }
@@ -98,7 +102,7 @@ function loadGame() {
  //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
-  newGame(); 
+  //newGame(); 
 
   requestAnimationFrame(drawGame);
   //requestAnimationFrame(animateButton); 
