@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
+import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
 import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
@@ -14,7 +15,7 @@ import libSprite_v2 from "./libSprite_v2.mjs";
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
-
+const chkMuteSound = document.getElementById("chkMuteSound");
 const cvs = document.getElementById("cvs");
 const spcvs = new libSprite.TSpriteCanvas(cvs);; 
 let gameSpeed = 4; // Game speed multiplier;
@@ -36,16 +37,26 @@ export const SheetData = {
 };
 
 export const GameProps = {
+  soundMuted: false,
   gameBoard: null,
   gameStatus: EGameStatus.Idle,
   snake: null,
   bait: null,
   menu: null, 
+  sounds:{food:null, running:null, gameOver:null}, 
 };
 
 //------------------------------------------------------------------------------------------
 //----------- Exported functions -----------------------------------------------------------
 //------------------------------------------------------------------------------------------
+
+export function playSound(aSound) { //Tatt fra FlappyBird
+  if (!GameProps.soundMuted) {
+    aSound.play();
+  } else {
+    aSound.pause();
+  }
+}
 
 export function newGame() {
   GameProps.gameBoard = new TGameBoard();
@@ -57,8 +68,15 @@ export function newGame() {
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
-  /* Logic to increase the snake size and score when bait is eaten */
+  playSound(GameProps.sounds.food); 
+  GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+  playSound(GameProps.sounds.food); 
+
   GameProps.bait.update(); 
+  /* Logic to increase the snake size and score when bait is eaten */
+
+  //Make snake bigger when eating the apple using the clone function found in the snake class libSprite_v2.mjs
+  GameProps.snake.addSnakePart(); // Add a new part to the snake
 
   increaseGameSpeed(); // Increase game speed
 }
@@ -83,6 +101,11 @@ function loadGame() {
   console.log("Game canvas is rendering!");
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
   console.log("Game canvas is updating!");
+
+  //Loading sounds
+  GameProps.sounds.food = new libSound.TSoundFile("./Music/food.mp3");
+  GameProps.sounds.running = new libSound.TSoundFile("./Music/running.mp3");
+  GameProps.sounds.gameOver = new libSound.TSoundFile("./Music/heroIsDead.mp3");
 
 }
 
@@ -121,6 +144,9 @@ function updateGame() {
         GameProps.gameStatus = EGameStatus.GameOver;
         GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
+        playSound(GameProps.sounds.gameOver);
+        GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+        playSound(GameProps.sounds.gameOver); // Play the game over sound
       }
       break;
   }
@@ -134,6 +160,18 @@ function increaseGameSpeed() {
 //-----------------------------------------------------------------------------------------
 //----------- Event handlers --------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+
+
+function setSoundOnOff() { //Tatt fra FlappyBird
+  if (chkMuteSound.checked) {
+    GameProps.soundMuted = true;
+
+    console.log("Sound muted");
+  } else {
+    GameProps.soundMuted = false;
+    console.log("Sound on");
+  }
+} // end of setSoundOnOff
 
 function onKeyDown(event) {
   switch (event.key) {
@@ -162,6 +200,7 @@ function onKeyDown(event) {
 //-----------------------------------------------------------------------------------------
 //----------- main -----------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+chkMuteSound.addEventListener("change", setSoundOnOff); //sjekker for aktivitet på checboxen, om lyd skal være på eller av
 
 spcvs.loadSpriteSheet("./Media/spriteSheet.png", loadGame);
 document.addEventListener("keydown", onKeyDown);

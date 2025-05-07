@@ -1,6 +1,5 @@
 "use strict";
 /* Use this file to create the menu for the snake game. */
-
 import libSprite_v2 from "./libSprite_v2.mjs";
 import lib2d_v2 from "./lib2d_v2.mjs";
 import {
@@ -8,6 +7,7 @@ import {
   GameProps,
   SheetData,
   newGame,
+  playSound,
 } from "./game.mjs";
 import { GameBoardSize, EBoardCellInfoType, TGameBoard } from "./gameBoard.mjs";
 import { TSnake } from "./snake.mjs";
@@ -37,6 +37,7 @@ export class TMenu {
       newGame();
       GameProps.gameStatus = EGameStatus.Playing;
       console.log("Game started");
+      GameProps.sounds.running.play();
     };
 
     this.#spButtonPause = new libSprite_v2.TSpriteButton(
@@ -65,6 +66,7 @@ export class TMenu {
       pos
     );
     this.#spButtonRetry.onClick = () => {
+      newGame();
       GameProps.gameStatus = EGameStatus.Playing;
     };
     pos.x = 30;
@@ -82,14 +84,19 @@ export class TMenu {
         this.#spButtonPlay.draw();
         break;
       case EGameStatus.Playing:
+        playSound(GameProps.sounds.running); //Play musikk når game er i gang
+        //GameProps.sounds.running.play(); //Play musikk når game er i gang
         break;
       case EGameStatus.Pause:
         this.#spButtonPause.draw();
+        GameProps.sounds.running.pause(); //Pause musikk når pause
         break;
       case EGameStatus.GameOver:
         this.#spButtonGameOver.draw();
         this.#spButtonHome.draw(); //Legge de inn som buttins i tilleg??
         this.#spButtonRetry.draw(); //Legge de inn som buttins i tilleg??
+        //playSound(GameProps.sounds.gameOver);
+        GameProps.sounds.running.stop(); //Stopp musikk når game Oer
         break;
     }
   }
