@@ -78,9 +78,6 @@ class TSnakeHead extends TSnakePart {
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
       bateIsEaten();
     }else{
-      /*for(let score = 1000; score > 100; score--){
-        scoreTxt += score; //scoreText = knyttet til Number
-      }*/
       /* Decrease the score if the snake head is not on a bait cell */
     }
     boardCellInfo.infoType = EBoardCellInfoType.Snake; // Set the cell to Snake
@@ -188,11 +185,14 @@ class TSnakeBody extends TSnakePart {
 
 
 class TSnakeTail extends TSnakePart {
-  constructor(aSpriteCanvas, aCol, aRow) {
-    super(aSpriteCanvas, SheetData.Tail, aCol, aRow);
+  constructor(aSpriteCanvas,aBoardCell) {
+    super(aSpriteCanvas, SheetData.Tail, aBoardCell);
   }
 
   update(){
+    let boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
+    boardCellInfo.infoType = EBoardCellInfoType.Empty; // Clear the cell, before moving the tail
+  
     switch (this.direction) {
       case EDirection.Up:
         this.boardCell.row--;
@@ -207,9 +207,8 @@ class TSnakeTail extends TSnakePart {
         this.boardCell.row++;
         break;
     }
-    const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
-    boardCellInfo.infoType = EBoardCellInfoType.Empty; // Clear the cell, when the tail moves
-    this.direction = boardCellInfo.direction;
+    boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
+    this.direction = boardCellInfo.direction; // Update the direction of the tail based on the new cell
     this.index = this.direction;
     super.update();
   }
@@ -222,12 +221,14 @@ export class TSnake {
   #head = null;
   #body = null;
   #tail = null;
+  #grow;
   constructor(aSpriteCanvas, aBoardCell) {
     this.#head = new TSnakeHead(aSpriteCanvas, aBoardCell);
     let col = aBoardCell.col - 1;
     this.#body = [new TSnakeBody(aSpriteCanvas, new TBoardCell(col, aBoardCell.row))];
     col--;
     this.#tail = new TSnakeTail(aSpriteCanvas, new TBoardCell(col, aBoardCell.row));
+    this.#grow = false; 
   } // constructor
 
   draw() {
@@ -238,7 +239,6 @@ export class TSnake {
     this.#tail.draw();
   } // draw
 
-  //Returns true if the snake is alive
   update(){
     if (this.#isDead) {
       return false; // Snake is dead, do not continue
@@ -246,16 +246,43 @@ export class TSnake {
     if(this.#head.update()) {
       for (let i = 0; i < this.#body.length; i++) {
         this.#body[i].update();
-      }
-      this.#tail.update();  
+        }
+      if (!this.#grow) { // We check it the snake isent growing, if this is the case we move the tail to follow the rest of the snake
+        this.#tail.update(); 
+      } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesent grow on the next move
+      this.#grow = false; 
+    }  
     }else if(!this.#isDead){
       this.#isDead = true;
-      return false; // Collision detected, do not continue
+      return false; 
     }
-    return true; // No collision, continue
+    return true; 
   }
 
   setDirection(aDirection) {
     this.#head.setDirection(aDirection);
-  } // setDirection
+  } 
+
+  addSnakePart() { //vi lager en addSnakePart funksjon, har fått noen inspill fra ChatGpt med noe omskrivning for mer simplisitet
+    //delt med Helene/ annen elev 
+    let partToCopy; //we first pick which part of the snake to Copy
+    if (this.#body.length > 0) {
+      partToCopy = this.#body[this.#body.length - 1]; // So if the snake has body parts,we copy the last one 
+      } 
+    let newBodyPart = partToCopy.clone(); //Now we can make a new body part by copying the chosen part using the clone function from TSnakeBody class
+
+    // With the new body part we can now position it where the tail currently is 
+    newBodyPart.boardCell = new TBoardCell(this.#tail.boardCell.col, this.#tail.boardCell.row);  
+    newBodyPart.direction = this.#tail.direction;
+
+    // Update the game board for the new body part
+    GameProps.gameBoard.getCell(newBodyPart.boardCell.row, newBodyPart.boardCell.col).infoType = EBoardCellInfoType.Snake;
+    GameProps.gameBoard.getCell(newBodyPart.boardCell.row, newBodyPart.boardCell.col).direction = newBodyPart.direction;
+
+    // Add the new body part to the body array
+    this.#body.push(newBodyPart);
+    this.#grow = true;// Set grow flag to prevent tail from moving in the next update
+  }
+
+
 }

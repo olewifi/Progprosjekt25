@@ -12,10 +12,21 @@
         -ms-user-select: none; /* IE 10 and IE 11 */
         user-select: none; /* Standard syntax */
       }
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
     </style>
     <script type="module" src="./game.mjs" defer></script>
   </head>
   <body class="prevent-select" style="zoom: 1;">
     <canvas id="cvs" style="background-color: #fabd04"></canvas>
+    <fieldset style="max-width: 885px; margin-top: 0px">
+      <legend>Game Settings</legend>
+      <p>
+        <input id="chkMuteSound" type="checkbox" />
+        <label for="chkMuteSound">Mute sound</label>
+    </p>
   </body>
 </html>
