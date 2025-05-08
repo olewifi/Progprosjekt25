@@ -246,10 +246,10 @@ export class TSnake {
     if(this.#head.update()) {
       for (let i = 0; i < this.#body.length; i++) {
         this.#body[i].update();
-      }
-    if (!this.#grow) { // We check it the snake isent growing, if this is the case we move the tail to follow the rest of the snake
-    this.#tail.update(); 
-    } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesent grow on the next move
+        }
+      if (!this.#grow) { // We check it the snake isent growing, if this is the case we move the tail to follow the rest of the snake
+        this.#tail.update(); 
+      } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesent grow on the next move
       this.#grow = false; 
     }  
     }else if(!this.#isDead){
@@ -264,6 +264,7 @@ export class TSnake {
   } 
 
   addSnakePart() { //vi lager en addSnakePart funksjon, har fått noen inspill fra ChatGpt med noe omskrivning for mer simplisitet
+    //delt med Helene/ annen elev 
     let partToCopy; //we first pick which part of the snake to Copy
     if (this.#body.length > 0) {
       partToCopy = this.#body[this.#body.length - 1]; // So if the snake has body parts,we copy the last one 

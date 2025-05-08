@@ -46,6 +46,9 @@ export class TMenu {
       pos
     );
     this.#spButtonPause.animateSpeed = 45;
+    this.#spButtonPause.onClick = () => {
+      GameProps.gameStatus = EGameStatus.Playing;
+    };
 
     pos.x = 95; 
     pos.y = 398;
@@ -78,53 +81,119 @@ export class TMenu {
     );
   }
 
+
   draw() { //Alle knapper har visable lik false og true, bruker dermed disse for å skjule knapper når de ikke er på skjermen
-    switch (GameProps.gameStatus) {
+    switch (GameProps.gameStatus){
       case EGameStatus.Idle:
-        //this.#spButtonPlay.visible = true; //Viser play knappen når game er idle
         this.#spButtonPlay.draw();
-        //this.#spButtonPlay.visible = false; 
-        //this.#spButtonPlay.disable = true; 
+
         this.#spButtonPause.visible = false; 
+        this.#spButtonHome.visible = false; 
         break;
+        
       case EGameStatus.Playing:
-        playSound(GameProps.sounds.running); //Play musikk når game er i gang
-        //GameProps.sounds.running.play(); //Play musikk når game er i gang
-        this.#spButtonPlay.visible = false;
-        //this.#spButtonPlay.disable = true; 
+        //i want the music running to be here during the game and i want it to loop. the song enda after 2.33 minutes. 
+        //playSound(GameProps.sounds.running); // Play sound when game starts
+        //const MusicRunning = GameProps.sounds.running; // Play sound when game starts
+        
+        
+  
+  
+        this.#spButtonPlay.visible = false; 
         this.#spButtonHome.visible = false;
         this.#spButtonRetry.visible = false;
         this.#spButtonPause.visible = false; 
+        
         break;
+
       case EGameStatus.Pause:
+        GameProps.sounds.running.pause();
+
         this.#spButtonPause.draw();
-        GameProps.sounds.running.pause(); //Pause musikk når pause
+
         this.#spButtonPlay.visible = false;
-        //this.#spButtonPlay.disable = true; 
         this.#spButtonHome.visible = false;
         this.#spButtonRetry.visible = false;
         break;
+
       case EGameStatus.GameOver:
+        GameProps.sounds.running.stop(); 
+
+        this.#spButtonGameOver.draw();
+        this.#spButtonHome.draw(); 
+        this.#spButtonRetry.draw(); 
+
         this.#spButtonPause.visible = false; 
         this.#spButtonPlay.visible = true;
-        this.#spButtonGameOver.draw();
         this.#spButtonHome.visible = true; 
-        this.#spButtonHome.draw(); //Legge de inn som buttins i tilleg?? //home funker
         this.#spButtonRetry.visible = true;
-        this.#spButtonRetry.draw(); //Legge de inn som buttins i tilleg??
-        //playSound(GameProps.sounds.gameOver);
-        GameProps.sounds.running.stop(); //Stopp musikk når game Oer
         break;
     }
   }
 
+    /*
+
+draw(){
+  this.#spButtonPlay.draw();
+  this.#spButtonPause.draw();
+  this.#spButtonGameOver.draw();
+  this.#spButtonHome.draw();
+  this.#spButtonRetry.draw();
+  this.#spButtonResume.draw(); 
+
+
+  switch(GameProps.gameStatus) {
+    case EGameStatus.Idle:
+      this.#spButtonPlay.visible = true; 
+      this.#spButtonPause.visible = false; 
+      this.#spButtonGameOver.visible = false; 
+      this.#spButtonHome.visible = false; 
+      this.#spButtonRetry.visible = false; 
+      break;
+    case EGameStatus.Playing:
+      this.#spButtonPlay.visible = false; 
+      this.#spButtonPause.visible = true; 
+      this.#spButtonGameOver.visible = false; 
+      this.#spButtonHome.visible = false; 
+      this.#spButtonRetry.visible = false; 
+      break;
+    case EGameStatus.Pause:
+      this.#spButtonPlay.visible = false; 
+      this.#spButtonPause.visible = true; 
+      this.#spButtonGameOver.visible = false; 
+      this.#spButtonHome.visible = false; 
+      this.#spButtonRetry.visible = false; 
+      break;
+    case EGameStatus.GameOver:
+      this.#spButtonPlay.visible = true; 
+      this.#spButtonPause.visible = false; 
+      this.#spButtonGameOver.visible = true; 
+      this.#spButtonHome.visible = true; 
+      this.#spButtonRetry.visible = true; 
+      break;
+  }
+
   togglePause() {
     if (GameProps.gameStatus === EGameStatus.Pause) {
-      GameProps.gameStatus = EGameStatus.Playing;
-    } else {
-      GameProps.gameStatus = EGameStatus.Pause;
+      GameProps.gameStatus === EGameStatus.Playing;
+    } else if (GameProps.gameStatus === EGameStatus.Pause)
+      GameProps.gameStatus === EGameStatus.Playing;
     }
     this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
-  }
+
 }
+}
+*/
 //end of TMenu
+
+
+togglePause(){
+  if(GameProps.gameStatus === EGameStatus.Playing) {
+    GameProps.gameStatus = EGameStatus.Pause;
+  } else if(GameProps.gameStatus === EGameStatus.Pause) {
+    GameProps.gameStatus = EGameStatus.Playing;
+  }
+  this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
+  
+}
+}
