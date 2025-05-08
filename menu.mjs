@@ -95,9 +95,6 @@ export class TMenu {
         //i want the music running to be here during the game and i want it to loop. the song enda after 2.33 minutes. 
         //playSound(GameProps.sounds.running); // Play sound when game starts
         //const MusicRunning = GameProps.sounds.running; // Play sound when game starts
-        
-        
-  
   
         this.#spButtonPlay.visible = false; 
         this.#spButtonHome.visible = false;
