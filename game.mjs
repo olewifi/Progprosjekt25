@@ -1,18 +1,26 @@
 "use strict";
 
+//Bugs
+//mute button når man refresher siden
+
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
+import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
+import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
-import { TSnake, EDirection } from "./snake.mjs";
+import { TSnake, EDirection, } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
+import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
+import libSprite_v2 from "./libSprite_v2.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+const chkMuteSound = document.getElementById("chkMuteSound");
 const cvs = document.getElementById("cvs");
-const spcvs = new libSprite.TSpriteCanvas(cvs);
+const spcvs = new libSprite.TSpriteCanvas(cvs);; 
 let gameSpeed = 4; // Game speed multiplier;
 let hndUpdateGame = null;
 export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 };
@@ -32,15 +40,26 @@ export const SheetData = {
 };
 
 export const GameProps = {
+  soundMuted: false,
   gameBoard: null,
   gameStatus: EGameStatus.Idle,
   snake: null,
-  bait: null
+  bait: null,
+  menu: null, 
+  sounds:{food:null, running:null, gameOver:null}, 
 };
 
 //------------------------------------------------------------------------------------------
 //----------- Exported functions -----------------------------------------------------------
 //------------------------------------------------------------------------------------------
+
+export function playSound(aSound) { //Tatt fra FlappyBird
+  if (!GameProps.soundMuted) {
+    aSound.play();
+  } else {
+    aSound.pause();
+  }
+}
 
 export function newGame() {
   GameProps.gameBoard = new TGameBoard();
@@ -52,11 +71,16 @@ export function newGame() {
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
+  playSound(GameProps.sounds.food); 
+  GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+  playSound(GameProps.sounds.food); 
+
+  GameProps.bait.update(); 
   /* Logic to increase the snake size and score when bait is eaten */
+  GameProps.snake.addSnakePart(); 
 
   increaseGameSpeed(); // Increase game speed
 }
-
 
 //------------------------------------------------------------------------------------------
 //----------- functions -------------------------------------------------------------------
@@ -66,28 +90,48 @@ function loadGame() {
   cvs.width = GameBoardSize.Cols * SheetData.Head.width;
   cvs.height = GameBoardSize.Rows * SheetData.Head.height;
 
-  GameProps.gameStatus = EGameStatus.Playing; // change game status to Idle
 
-  /* Create the game menu here */ 
+  GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
+ //GameProps.menu.onClick = EGameStatus.Playing; 
+  GameProps.menu = new TMenu(spcvs); 
 
-  newGame(); // Call this function from the menu to start a new game, remove this line when the menu is ready
+  //newGame(); 
 
   requestAnimationFrame(drawGame);
+  
   console.log("Game canvas is rendering!");
-  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); // Update game every 1000ms / gameSpeed
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
   console.log("Game canvas is updating!");
+
+  //Loading sounds
+  GameProps.sounds.food = new libSound.TSoundFile("./Music/food.mp3");
+  GameProps.sounds.running = new libSound.TSoundFile("./Music/running.mp3");
+  GameProps.sounds.gameOver = new libSound.TSoundFile("./Music/heroIsDead.mp3");
+
 }
+
 
 function drawGame() {
   // Clear the canvas
   spcvs.clearCanvas();
 
   switch (GameProps.gameStatus) {
+    case EGameStatus.Idle:
+      GameProps.menu.draw();
+      break; 
     case EGameStatus.Playing:
+      GameProps.bait.draw();
+      GameProps.snake.draw();
+      GameProps.menu.draw(); 
+      break; 
     case EGameStatus.Pause:
       GameProps.bait.draw();
       GameProps.snake.draw();
+      GameProps.menu.draw(); 
       break;
+    case EGameStatus.GameOver:
+      GameProps.menu.draw(); 
+      break; 
   }
   // Request the next frame
   requestAnimationFrame(drawGame);
@@ -99,7 +143,11 @@ function updateGame() {
     case EGameStatus.Playing:
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
+       // GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
+        playSound(GameProps.sounds.gameOver);
+        GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+        playSound(GameProps.sounds.gameOver); // Play the game over sound
       }
       break;
   }
@@ -110,10 +158,21 @@ function increaseGameSpeed() {
   console.log("Increase game speed!");
 }
 
-
 //-----------------------------------------------------------------------------------------
 //----------- Event handlers --------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+
+
+function setSoundOnOff() { //Tatt fra FlappyBird
+  if (chkMuteSound.checked) {
+    GameProps.soundMuted = true;
+
+    console.log("Sound muted");
+  } else {
+    GameProps.soundMuted = false;
+    console.log("Sound on");
+  }
+} // end of setSoundOnOff
 
 function onKeyDown(event) {
   switch (event.key) {
@@ -132,15 +191,17 @@ function onKeyDown(event) {
     case " ":
       console.log("Space key pressed!");
       /* Pause the game logic here */
+      GameProps.menu.togglePause(); 
       
       break;
     default:
-      console.log(`Key pressed: "${event.key}"`);
+      console.log(`Key pressed: "${event.key}"`); 
   }
 }
 //-----------------------------------------------------------------------------------------
 //----------- main -----------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
+chkMuteSound.addEventListener("change", setSoundOnOff); //sjekker for aktivitet på checboxen, om lyd skal være på eller av
 
 spcvs.loadSpriteSheet("./Media/spriteSheet.png", loadGame);
 document.addEventListener("keydown", onKeyDown);
