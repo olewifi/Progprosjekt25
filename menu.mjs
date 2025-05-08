@@ -19,6 +19,8 @@ export class TMenu {
   #spButtonRetry;
   #spButtonResume;
   #spButtonPause;
+  #spScore;
+  #spCurrentScore;
 
   constructor(aSpriteCanvas) {
     //get position for button to be in the middle of the canvas
@@ -79,6 +81,20 @@ export class TMenu {
       SheetData.GameOver,
       pos
     );
+    pos.x = 520;
+    pos.y = 269;
+    this.#spScore = new libSprite_v2.TSpriteNumber(
+        aSpriteCanvas,
+        SheetData.Number,
+        pos
+    );
+    pos.x = 0;
+    pos.y = 0;
+    this.#spCurrentScore = new libSprite_v2.TSpriteNumber(
+        aSpriteCanvas,
+        SheetData.Number,
+        pos
+    );
   }
 
 
@@ -86,7 +102,6 @@ export class TMenu {
     switch (GameProps.gameStatus){
       case EGameStatus.Idle:
         this.#spButtonPlay.draw();
-
         this.#spButtonPause.visible = false; 
         this.#spButtonHome.visible = false; 
         break;
@@ -99,7 +114,9 @@ export class TMenu {
         this.#spButtonPlay.visible = false; 
         this.#spButtonHome.visible = false;
         this.#spButtonRetry.visible = false;
-        this.#spButtonPause.visible = false; 
+        this.#spButtonPause.visible = false;
+        this.#spCurrentScore.value = GameProps.totalScore;
+        this.#spCurrentScore.draw();
         
         break;
 
@@ -124,6 +141,9 @@ export class TMenu {
         this.#spButtonPlay.visible = true;
         this.#spButtonHome.visible = true; 
         this.#spButtonRetry.visible = true;
+
+        this.#spScore.value = GameProps.totalScore;
+        this.#spScore.draw();
         break;
     }
   }

@@ -42,18 +42,20 @@ export const SheetData = {
 export const GameProps = {
   soundMuted: false,
   gameBoard: null,
-  gameStatus: EGameStatus.Idle,
+  gameStatus: EGameStatus.idle,
   snake: null,
   bait: null,
   menu: null, 
-  sounds:{food:null, running:null, gameOver:null}, 
+  sounds:{food:null, running:null, gameOver:null},
+  totalScore: 0,
+  baitScore: 50,
 };
 
 //------------------------------------------------------------------------------------------
 //----------- Exported functions -----------------------------------------------------------
 //------------------------------------------------------------------------------------------
 
-export function playSound(aSound) { //Tatt fra FlappyBird
+export function playSound(aSound) { //Importert fra FlappyBird
   if (!GameProps.soundMuted) {
     aSound.play();
   } else {
@@ -66,6 +68,7 @@ export function newGame() {
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
   GameProps.bait = new TBait(spcvs); // Initialize bait with a starting position
   gameSpeed = 4; // Reset game speed
+  GameProps.totalScore = 0;
 }
 
 export function bateIsEaten() {
@@ -75,10 +78,18 @@ export function bateIsEaten() {
   GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
   playSound(GameProps.sounds.food); 
 
-  GameProps.bait.update(); 
-  /* Logic to increase the snake size and score when bait is eaten */
-  GameProps.snake.addSnakePart(); 
 
+  /* Logic to increase the snake size and score when bait is eaten */
+  //Increase snake size
+  GameProps.snake.addSnakePart(); 
+  
+  //Increase score when bait is eaten//
+  GameProps.totalScore += GameProps.baitScore;
+  console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
+  //resetting baitscore
+  GameProps.baitScore = 50;
+
+  GameProps.bait.update(); 
   increaseGameSpeed(); // Increase game speed
 }
 
@@ -155,7 +166,8 @@ function updateGame() {
 
 function increaseGameSpeed() {
   /* Increase game speed logic here */
-  console.log("Increase game speed!");
+  gameSpeed += 0.5; //adding speed
+  console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
 }
 
 //-----------------------------------------------------------------------------------------
