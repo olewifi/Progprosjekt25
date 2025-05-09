@@ -21,6 +21,7 @@ export class TMenu {
   #spButtonPause;
   #spScore;
   #spCurrentScore;
+  #spBaitScore;
 
   constructor(aSpriteCanvas) {
     //get position for button to be in the middle of the canvas
@@ -81,19 +82,33 @@ export class TMenu {
       SheetData.GameOver,
       pos
     );
-    pos.x = 520;
-    pos.y = 269;
-    this.#spScore = new libSprite_v2.TSpriteNumber(
-        aSpriteCanvas,
-        SheetData.Number,
-        pos
-    );
-    pos.x = 0;
-    pos.y = 0;
+    const currentScorePos = new lib2d_v2.TPosition(
+      0,
+      0
+    )
     this.#spCurrentScore = new libSprite_v2.TSpriteNumber(
         aSpriteCanvas,
         SheetData.Number,
-        pos
+        currentScorePos
+    );
+    const baitScorePos = new lib2d_v2.TPosition(
+      750,
+      0
+    )
+    this.#spBaitScore = new libSprite_v2.TSpriteNumber(
+      aSpriteCanvas,
+      SheetData.Number,
+      baitScorePos
+    );
+    const scorePos = new lib2d_v2.TPosition(
+      520,
+      269
+    )
+   
+    this.#spScore = new libSprite_v2.TSpriteNumber(
+        aSpriteCanvas,
+        SheetData.Number,
+        scorePos
     );
   }
 
@@ -115,8 +130,11 @@ export class TMenu {
         this.#spButtonHome.visible = false;
         this.#spButtonRetry.visible = false;
         this.#spButtonPause.visible = false;
+
         this.#spCurrentScore.value = GameProps.totalScore;
         this.#spCurrentScore.draw();
+        this.#spBaitScore.value = GameProps.baitScore;
+        this.#spBaitScore.draw();
         
         break;
 
@@ -132,6 +150,7 @@ export class TMenu {
 
       case EGameStatus.GameOver:
         GameProps.sounds.running.stop(); 
+        this.#spCurrentScore.visible = false;
 
         this.#spButtonGameOver.draw();
         this.#spButtonHome.draw(); 
@@ -213,4 +232,4 @@ togglePause(){
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
   
 }
-}
+}//End of TMenu

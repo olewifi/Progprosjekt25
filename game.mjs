@@ -88,7 +88,6 @@ export function bateIsEaten() {
   console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
   //resetting baitscore
   GameProps.baitScore = 50;
-
   GameProps.bait.update(); 
   increaseGameSpeed(); // Increase game speed
 }
