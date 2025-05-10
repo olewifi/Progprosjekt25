@@ -53,27 +53,26 @@ export const GameProps = {
 //----------- Exported functions -----------------------------------------------------------
 //------------------------------------------------------------------------------------------
 
-export function playSound(aSound) { //Tatt fra FlappyBird
-  if (!GameProps.soundMuted) {
-    aSound.play();
-  } else {
-    aSound.pause();
-  }
-}
 
 export function newGame() {
   GameProps.gameBoard = new TGameBoard();
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
   GameProps.bait = new TBait(spcvs); // Initialize bait with a starting position
   gameSpeed = 4; // Reset game speed
+
+  setSoundOnOff(); //når nytt spill, så sjekk om lyd er muted
+  GameProps.gameStatus = EGameStatus.Playing; 
+  console.log("Game started");
+  startMusic();
+  
 }
 
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
-  playSound(GameProps.sounds.food); 
+  GameProps.sounds.food.play(); 
   GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-  playSound(GameProps.sounds.food); 
+  GameProps.sounds.food.play(); 
 
   GameProps.bait.update(); 
   /* Logic to increase the snake size and score when bait is eaten */
@@ -96,7 +95,7 @@ function loadGame() {
   GameProps.menu = new TMenu(spcvs); 
 
   //newGame(); 
-
+  GameProps.menu.hideStuff();
   requestAnimationFrame(drawGame);
   
   console.log("Game canvas is rendering!");
@@ -106,6 +105,8 @@ function loadGame() {
   //Loading sounds
   GameProps.sounds.food = new libSound.TSoundFile("./Music/food.mp3");
   GameProps.sounds.running = new libSound.TSoundFile("./Music/running.mp3");
+  //GameProps.sounds.running.loop = true;
+
   GameProps.sounds.gameOver = new libSound.TSoundFile("./Music/heroIsDead.mp3");
 
 }
@@ -145,9 +146,10 @@ function updateGame() {
         GameProps.gameStatus = EGameStatus.GameOver;
        // GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
-        playSound(GameProps.sounds.gameOver);
         GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-        playSound(GameProps.sounds.gameOver); // Play the game over sound
+        GameProps.sounds.gameOver.play(); // Play the game over sound
+        GameProps.sounds.running.stop();
+        GameProps.menu.gameOver();
       }
       break;
   }
@@ -163,16 +165,36 @@ function increaseGameSpeed() {
 //-----------------------------------------------------------------------------------------
 
 
-function setSoundOnOff() { //Tatt fra FlappyBird
+function setSoundOnOff() { //Tatt fra FlappyBird, sjekker om lyden er muted eller på 
   if (chkMuteSound.checked) {
     GameProps.soundMuted = true;
-
+    GameProps.sounds.running.stop();
     console.log("Sound muted");
   } else {
     GameProps.soundMuted = false;
+    startMusic();
     console.log("Sound on");
   }
 } // end of setSoundOnOff
+
+export function startMusic() { //starter musikk ved unpause, unmute, og start spill 
+  // Reset music
+  if (!GameProps.soundMuted) {
+    GameProps.sounds.running.stop();
+    GameProps.sounds.running.play();
+    console.log("Music playing"); 
+
+    clearInterval();
+    setInterval(() => {
+      if (!GameProps.soundMuted) {
+        GameProps.sounds.running.stop();
+        GameProps.sounds.running.play(); 
+      }
+    }, 153000); // 2.33 minutes in milliseconds
+
+    GameProps.isRunningSoundPlaying = true;
+  }
+}
 
 function onKeyDown(event) {
   switch (event.key) {

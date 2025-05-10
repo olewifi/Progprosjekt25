@@ -7,10 +7,8 @@ import {
   GameProps,
   SheetData,
   newGame,
-  playSound,
+  startMusic,
 } from "./game.mjs";
-import { GameBoardSize, EBoardCellInfoType, TGameBoard } from "./gameBoard.mjs";
-import { TSnake } from "./snake.mjs";
 
 export class TMenu {
   #spButtonPlay;
@@ -35,9 +33,7 @@ export class TMenu {
     this.#spButtonPlay.animateSpeed = 45;
     this.#spButtonPlay.onClick = () => {
       newGame();
-      GameProps.gameStatus = EGameStatus.Playing;
-      console.log("Game started");
-      GameProps.sounds.running.play();
+      this.#spButtonPlay.visible = false;
     };
 
     this.#spButtonPause = new libSprite_v2.TSpriteButton(
@@ -47,7 +43,7 @@ export class TMenu {
     );
     this.#spButtonPause.animateSpeed = 45;
     this.#spButtonPause.onClick = () => {
-      GameProps.gameStatus = EGameStatus.Playing;
+      this.togglePause();
     };
 
     pos.x = 95; 
@@ -58,7 +54,7 @@ export class TMenu {
       pos
     );
     this.#spButtonHome.onClick = () => {
-      GameProps.gameStatus = EGameStatus.Idle;
+      this.homeButton();
     };
 
     pos.x = 645;
@@ -68,10 +64,14 @@ export class TMenu {
       SheetData.Retry,
       pos
     );
+    
     this.#spButtonRetry.onClick = () => {
       newGame();
-      GameProps.gameStatus = EGameStatus.Playing;
+      this.hideStuff();
+      this.#spButtonRetry.visible = false;
+      this.#spButtonPlay.visible = false;
     };
+
     pos.x = 30;
     pos.y = 50;
     this.#spButtonGameOver = new libSprite_v2.TSprite(
@@ -81,119 +81,51 @@ export class TMenu {
     );
   }
 
+homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig
+  GameProps.gameStatus = EGameStatus.Idle;
+  this.#spButtonPlay.visible = true;
+  this.#spButtonHome.visible = false;
+  this.#spButtonRetry.visible = false;
+  this.#spButtonGameOver.visible = false;
+  this.#spButtonPause.visible = false; 
+}
 
-  draw() { //Alle knapper har visable lik false og true, bruker dermed disse for å skjule knapper når de ikke er på skjermen
-    switch (GameProps.gameStatus){
-      case EGameStatus.Idle:
-        this.#spButtonPlay.draw();
-
-        this.#spButtonPause.visible = false; 
-        this.#spButtonHome.visible = false; 
-        break;
-        
-      case EGameStatus.Playing:
-        //i want the music running to be here during the game and i want it to loop. the song enda after 2.33 minutes. 
-        //playSound(GameProps.sounds.running); // Play sound when game starts
-        //const MusicRunning = GameProps.sounds.running; // Play sound when game starts
-        
-        
+draw() { //her tegnes ting som er visible 
   
-  
-        this.#spButtonPlay.visible = false; 
-        this.#spButtonHome.visible = false;
-        this.#spButtonRetry.visible = false;
-        this.#spButtonPause.visible = false; 
-        
-        break;
-
-      case EGameStatus.Pause:
-        GameProps.sounds.running.pause();
-
-        this.#spButtonPause.draw();
-
-        this.#spButtonPlay.visible = false;
-        this.#spButtonHome.visible = false;
-        this.#spButtonRetry.visible = false;
-        break;
-
-      case EGameStatus.GameOver:
-        GameProps.sounds.running.stop(); 
-
-        this.#spButtonGameOver.draw();
-        this.#spButtonHome.draw(); 
-        this.#spButtonRetry.draw(); 
-
-        this.#spButtonPause.visible = false; 
-        this.#spButtonPlay.visible = true;
-        this.#spButtonHome.visible = true; 
-        this.#spButtonRetry.visible = true;
-        break;
-    }
-  }
-
-    /*
-
-draw(){
-  this.#spButtonPlay.draw();
-  this.#spButtonPause.draw();
   this.#spButtonGameOver.draw();
-  this.#spButtonHome.draw();
-  this.#spButtonRetry.draw();
-  this.#spButtonResume.draw(); 
-
-
-  switch(GameProps.gameStatus) {
-    case EGameStatus.Idle:
-      this.#spButtonPlay.visible = true; 
-      this.#spButtonPause.visible = false; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.Playing:
-      this.#spButtonPlay.visible = false; 
-      this.#spButtonPause.visible = true; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.Pause:
-      this.#spButtonPlay.visible = false; 
-      this.#spButtonPause.visible = true; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.GameOver:
-      this.#spButtonPlay.visible = true; 
-      this.#spButtonPause.visible = false; 
-      this.#spButtonGameOver.visible = true; 
-      this.#spButtonHome.visible = true; 
-      this.#spButtonRetry.visible = true; 
-      break;
+  this.#spButtonHome.draw(); 
+  this.#spButtonPlay.draw(); 
+  this.#spButtonPause.draw(); 
+  this.#spButtonRetry.draw(); 
   }
 
-  togglePause() {
-    if (GameProps.gameStatus === EGameStatus.Pause) {
-      GameProps.gameStatus === EGameStatus.Playing;
-    } else if (GameProps.gameStatus === EGameStatus.Pause)
-      GameProps.gameStatus === EGameStatus.Playing;
-    }
-    this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
-
+gameOver(){  
+  this.#spButtonGameOver.visible = true;
+  this.#spButtonRetry.visible = true;
+  this.#spButtonHome.visible = true;
 }
+
+
+hideStuff() { //hjemmer alt utennom play når spillet lastes 
+  this.#spButtonPlay.visible = true; 
+  this.#spButtonPause.visible = false; 
+  this.#spButtonRetry.visible = false; 
+  this.#spButtonHome.visible = false; 
+  this.#spButtonGameOver.visible = false;
 }
-*/
-//end of TMenu
 
-
-togglePause(){
+togglePause(){ //toggler pause + musikk 
   if(GameProps.gameStatus === EGameStatus.Playing) {
     GameProps.gameStatus = EGameStatus.Pause;
+    GameProps.isRunningSoundPlaying = false;
+    GameProps.sounds.running.stop();
+    
   } else if(GameProps.gameStatus === EGameStatus.Pause) {
     GameProps.gameStatus = EGameStatus.Playing;
+    GameProps.isRunningSoundPlaying = true;
+    startMusic();
   }
-  this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
   
+  this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
 }
 }
