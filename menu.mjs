@@ -81,7 +81,7 @@ export class TMenu {
     );
   }
 
-homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig 
+homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig
   GameProps.gameStatus = EGameStatus.Idle;
   this.#spButtonPlay.visible = true;
   this.#spButtonHome.visible = false;
