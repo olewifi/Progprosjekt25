@@ -102,6 +102,7 @@ export class TMenu {
         SheetData.Number,
         currentScorePos
     );
+    this.#spCurrentScore.alpha = 0.7; 
     const baitScorePos = new lib2d_v2.TPosition(
       750,
       0
@@ -111,6 +112,7 @@ export class TMenu {
       SheetData.Number,
       baitScorePos
     );
+    this.#spBaitScore.alpha = 0.7; 
     const scorePos = new lib2d_v2.TPosition(
       520,
       269
