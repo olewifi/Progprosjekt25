@@ -8,12 +8,12 @@
 //-----------------------------------------------------------------------------------------
 import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
-import lib2d_v2 from "./lib2d_v2.mjs";
+//import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection, } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
 import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
-import libSprite_v2 from "./libSprite_v2.mjs";
+//import libSprite_v2 from "./libSprite_v2.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
@@ -47,6 +47,8 @@ export const GameProps = {
   bait: null,
   menu: null, 
   sounds:{food:null, running:null, gameOver:null}, 
+  totalScore: 0,
+  baitScore: 50,
 };
 
 //------------------------------------------------------------------------------------------
@@ -59,27 +61,54 @@ export function newGame() {
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
   GameProps.bait = new TBait(spcvs); // Initialize bait with a starting position
   gameSpeed = 4; // Reset game speed
+  GameProps.totalScore = 0; 
+  GameProps.baitScore = 50;
+  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //oppdaterer verdier før vi viser dem fram 
 
   setSoundOnOff(); //når nytt spill, så sjekk om lyd er muted
   GameProps.gameStatus = EGameStatus.Playing; 
   console.log("Game started");
   startMusic();
-  
+}
+
+export function startMusic() { //starter musikk ved unpause, unmute, og start spill 
+  // Reset music
+  if (!GameProps.soundMuted) {
+    GameProps.sounds.running.stop();
+    GameProps.sounds.running.play();
+    console.log("Music playing"); 
+
+    clearInterval();
+    setInterval(() => {
+      if (!GameProps.soundMuted) {
+        GameProps.sounds.running.stop();
+        GameProps.sounds.running.play(); 
+      }
+    }, 153000); // 2.33 minutes in milliseconds
+
+    GameProps.isRunningSoundPlaying = true;
+  }
 }
 
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
-  GameProps.sounds.food.play(); 
   GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-  GameProps.sounds.food.play(); 
+  if(!GameProps.soundMuted){
+  GameProps.sounds.food.play(); //spiller når ikke muted 
+  }
+ 
+  GameProps.snake.addSnakePart(); //Increase snake size
 
+  //Increase score when bait is eaten//
+  GameProps.totalScore += GameProps.baitScore;
+  console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
+ 
+  GameProps.baitScore = 50;  //resetting baitscore
   GameProps.bait.update(); 
-  /* Logic to increase the snake size and score when bait is eaten */
-  GameProps.snake.addSnakePart(); 
-
   increaseGameSpeed(); // Increase game speed
 }
+
 
 //------------------------------------------------------------------------------------------
 //----------- functions -------------------------------------------------------------------
@@ -91,7 +120,6 @@ function loadGame() {
 
 
   GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
- //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
   //newGame(); 
@@ -105,10 +133,7 @@ function loadGame() {
   //Loading sounds
   GameProps.sounds.food = new libSound.TSoundFile("./Music/food.mp3");
   GameProps.sounds.running = new libSound.TSoundFile("./Music/running.mp3");
-  //GameProps.sounds.running.loop = true;
-
   GameProps.sounds.gameOver = new libSound.TSoundFile("./Music/heroIsDead.mp3");
-
 }
 
 
@@ -144,20 +169,25 @@ function updateGame() {
     case EGameStatus.Playing:
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
-       // GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
-        GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-        GameProps.sounds.gameOver.play(); // Play the game over sound
+         if (!GameProps.soundMuted) {
+
+          GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+          GameProps.sounds.gameOver.play(); // Play the game over sound
+        } 
         GameProps.sounds.running.stop();
-        GameProps.menu.gameOver();
+        GameProps.menu.gameOver(); 
+
       }
+      GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); 
+
       break;
   }
 }
 
 function increaseGameSpeed() {
-  /* Increase game speed logic here */
-  console.log("Increase game speed!");
+   gameSpeed += 0.5; //adding speed
+  console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
 }
 
 //-----------------------------------------------------------------------------------------
@@ -172,29 +202,14 @@ function setSoundOnOff() { //Tatt fra FlappyBird, sjekker om lyden er muted elle
     console.log("Sound muted");
   } else {
     GameProps.soundMuted = false;
-    startMusic();
+    if(GameProps.gameStatus === EGameStatus.Playing){
+       startMusic(); //starter kun musikk når man spiller spillet, selv ved når man trykker mute og unmute
+    } //
     console.log("Sound on");
   }
 } // end of setSoundOnOff
 
-export function startMusic() { //starter musikk ved unpause, unmute, og start spill 
-  // Reset music
-  if (!GameProps.soundMuted) {
-    GameProps.sounds.running.stop();
-    GameProps.sounds.running.play();
-    console.log("Music playing"); 
-
-    clearInterval();
-    setInterval(() => {
-      if (!GameProps.soundMuted) {
-        GameProps.sounds.running.stop();
-        GameProps.sounds.running.play(); 
-      }
-    }, 153000); // 2.33 minutes in milliseconds
-
-    GameProps.isRunningSoundPlaying = true;
-  }
-}
+//her var startMusic
 
 function onKeyDown(event) {
   switch (event.key) {
