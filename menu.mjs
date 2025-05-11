@@ -1,4 +1,7 @@
 "use strict";
+
+
+"use strict";
 /* Use this file to create the menu for the snake game. */
 import libSprite_v2 from "./libSprite_v2.mjs";
 import lib2d_v2 from "./lib2d_v2.mjs";
@@ -15,9 +18,11 @@ export class TMenu {
   #spButtonGameOver;
   #spButtonHome;
   #spButtonRetry;
-  #spButtonResume;
   #spButtonPause;
-
+  #spScore;
+  #spCurrentScore;
+  #spBaitScore;
+  
   constructor(aSpriteCanvas) {
     //get position for button to be in the middle of the canvas
     const pos = new lib2d_v2.TPosition(
@@ -33,7 +38,10 @@ export class TMenu {
     this.#spButtonPlay.animateSpeed = 45;
     this.#spButtonPlay.onClick = () => {
       newGame();
-      this.#spButtonPlay.visible = false;
+      this.#spButtonPlay.visible = false; 
+      this.#spBaitScore.visible = true; 
+      this.#spCurrentScore.visible = true; 
+       
     };
 
     this.#spButtonPause = new libSprite_v2.TSpriteButton(
@@ -55,6 +63,7 @@ export class TMenu {
     );
     this.#spButtonHome.onClick = () => {
       this.homeButton();
+  
     };
 
     pos.x = 645;
@@ -64,12 +73,16 @@ export class TMenu {
       SheetData.Retry,
       pos
     );
+
     
     this.#spButtonRetry.onClick = () => {
       newGame();
       this.hideStuff();
       this.#spButtonRetry.visible = false;
       this.#spButtonPlay.visible = false;
+      this.#spScore.visible = false; 
+      this.#spCurrentScore.visible = true; 
+      this.#spBaitScore.visible = true; 
     };
 
     pos.x = 30;
@@ -79,15 +92,50 @@ export class TMenu {
       SheetData.GameOver,
       pos
     );
+
+    const currentScorePos = new lib2d_v2.TPosition(
+      0,
+      0
+    )
+    this.#spCurrentScore = new libSprite_v2.TSpriteNumber(
+        aSpriteCanvas,
+        SheetData.Number,
+        currentScorePos
+    );
+    this.#spCurrentScore.alpha = 0.7; 
+    const baitScorePos = new lib2d_v2.TPosition(
+      750,
+      0
+    )
+    this.#spBaitScore = new libSprite_v2.TSpriteNumber(
+      aSpriteCanvas,
+      SheetData.Number,
+      baitScorePos
+    );
+    this.#spBaitScore.alpha = 0.7; 
+    const scorePos = new lib2d_v2.TPosition(
+      520,
+      269
+    )
+   
+    this.#spScore = new libSprite_v2.TSpriteNumber(
+        aSpriteCanvas,
+        SheetData.Number,
+        scorePos
+    );
   }
 
-homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig
+homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig 
   GameProps.gameStatus = EGameStatus.Idle;
   this.#spButtonPlay.visible = true;
   this.#spButtonHome.visible = false;
   this.#spButtonRetry.visible = false;
   this.#spButtonGameOver.visible = false;
   this.#spButtonPause.visible = false; 
+   this.#spScore.visible = false; 
+ // this.spBaitScore.visible = false; 
+ // this.spCurrentScore.visible = false; 
+  //this.spScore.visible = false; 
 }
 
 draw() { //her tegnes ting som er visible 
@@ -97,12 +145,20 @@ draw() { //her tegnes ting som er visible
   this.#spButtonPlay.draw(); 
   this.#spButtonPause.draw(); 
   this.#spButtonRetry.draw(); 
+  this.#spBaitScore.draw(); 
+  this.#spCurrentScore.draw();
+  this.#spScore.draw(); 
   }
+
 
 gameOver(){  
   this.#spButtonGameOver.visible = true;
   this.#spButtonRetry.visible = true;
   this.#spButtonHome.visible = true;
+  this.#spScore.visible = true; 
+  this.#spBaitScore.visible = false;
+  this.#spCurrentScore.visible = false; 
+  
 }
 
 
@@ -112,6 +168,15 @@ hideStuff() { //hjemmer alt utennom play når spillet lastes
   this.#spButtonRetry.visible = false; 
   this.#spButtonHome.visible = false; 
   this.#spButtonGameOver.visible = false;
+  this.#spBaitScore.visible = false; 
+  this.#spCurrentScore.visible = false; 
+  this.#spScore.visible = false; 
+}
+
+updateScore(baitScore, totalScore){
+  this.#spCurrentScore.value = totalScore;
+  this.#spBaitScore.value = baitScore;
+  this.#spScore.value = totalScore; 
 }
 
 togglePause(){ //toggler pause + musikk 
@@ -125,7 +190,7 @@ togglePause(){ //toggler pause + musikk
     GameProps.isRunningSoundPlaying = true;
     startMusic();
   }
-  
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
 }
+
 }
