@@ -79,7 +79,7 @@ class TSnakeHead extends TSnakePart {
       bateIsEaten();
     }else{
     /* Decrease the score if the snake head is not on a bait cell */
-     if(GameProps.baitScore >= 1){
+     if(GameProps.baitScore > 1){
         GameProps.baitScore--;
       }
     }

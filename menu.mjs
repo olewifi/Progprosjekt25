@@ -17,7 +17,6 @@ export class TMenu {
   #spButtonGameOver;
   #spButtonHome;
   #spButtonRetry;
-  #spButtonResume;
   #spButtonPause;
   #spScore;
   #spCurrentScore;
@@ -89,26 +88,33 @@ export class TMenu {
     this.#spCurrentScore = new libSprite_v2.TSpriteNumber(
         aSpriteCanvas,
         SheetData.Number,
-        currentScorePos
+        currentScorePos,
+        null,
+        0.7
     );
     const baitScorePos = new lib2d_v2.TPosition(
-      750,
-      0
+      0,
+      100
     )
     this.#spBaitScore = new libSprite_v2.TSpriteNumber(
       aSpriteCanvas,
       SheetData.Number,
-      baitScorePos
+      baitScorePos,
+      null,
+      0.7
     );
     const scorePos = new lib2d_v2.TPosition(
       520,
       269
     )
    
+
     this.#spScore = new libSprite_v2.TSpriteNumber(
         aSpriteCanvas,
         SheetData.Number,
-        scorePos
+        scorePos,
+        null,
+        1.0
     );
   }
 
