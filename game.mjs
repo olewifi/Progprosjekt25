@@ -1,29 +1,28 @@
 "use strict";
 
-//Bugs
-//mute button når man refresher siden
+
 
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
 import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
-//import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection, } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
-import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
-//import libSprite_v2 from "./libSprite_v2.mjs";
+import { TMenu } from "./menu.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
-const chkMuteSound = document.getElementById("chkMuteSound");
+export const chkMuteSound = document.getElementById("chkMuteSound");
 const cvs = document.getElementById("cvs");
-const spcvs = new libSprite.TSpriteCanvas(cvs);; 
+const spcvs = new libSprite.TSpriteCanvas(cvs);
 let gameSpeed = 4; // Game speed multiplier;
 let hndUpdateGame = null;
 export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 };
+
+let musicCounter = 153;
 
 // prettier-ignore
 export const SheetData = {
@@ -60,53 +59,59 @@ export function newGame() {
   GameProps.gameBoard = new TGameBoard();
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
   GameProps.bait = new TBait(spcvs); // Initialize bait with a starting position
-  gameSpeed = 4; // Reset game speed
+  gameSpeed = 4; // Reset gamespeed
   GameProps.totalScore = 0; 
   GameProps.baitScore = 50;
-  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //oppdaterer verdier før vi viser dem fram 
+  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //Updates the scores value befor we show them
 
-  setSoundOnOff(); //når nytt spill, så sjekk om lyd er muted
+  setSoundOnOff(); //When new game, check if sound is muted
   GameProps.gameStatus = EGameStatus.Playing; 
   console.log("Game started");
   startMusic();
+
+  clearInterval(hndUpdateGame); 
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
 }
 
-export function startMusic() { //starter musikk ved unpause, unmute, og start spill 
-  // Reset music
+
+export function startMusic() { //Starts music when going out of the states of unpaused, unmuted and start game 
+  // Resets music
   if (!GameProps.soundMuted) {
     GameProps.sounds.running.stop();
     GameProps.sounds.running.play();
     console.log("Music playing"); 
-
     clearInterval();
     setInterval(() => {
-      if (!GameProps.soundMuted) {
+      if(GameProps.gameStatus != EGameStatus.GameOver && GameProps.gameStatus != EGameStatus.Idle) {
+        musicCounter--;
+      }
+      if (!GameProps.soundMuted && musicCounter <= 0) {
         GameProps.sounds.running.stop();
         GameProps.sounds.running.play(); 
+        musicCounter = 153;
       }
-    }, 153000); // 2.33 minutes in milliseconds
+    }, 1000); // 2.33 minutes in milliseconds
 
-    GameProps.isRunningSoundPlaying = true;
+   // GameProps.isRunningSoundPlaying = true;
   }
 }
 
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
-  GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
+  GameProps.sounds.food.stop(); //Must stop the music to rest, or else it will not play
   if(!GameProps.soundMuted){
-  GameProps.sounds.food.play(); //spiller når ikke muted 
+  GameProps.sounds.food.play(); //Plays when not muted 
   }
- 
+  increaseGameSpeed(); // Increase game speed
   GameProps.snake.addSnakePart(); //Increase snake size
 
   //Increase score when bait is eaten//
   GameProps.totalScore += GameProps.baitScore;
   console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
  
-  GameProps.baitScore = 50;  //resetting baitscore
-  GameProps.bait.update(); 
-  increaseGameSpeed(); // Increase game speed
+  GameProps.baitScore = 50;  //Resetting baitscore
+  GameProps.bait.update();  //Moves bait
 }
 
 
@@ -122,9 +127,8 @@ function loadGame() {
   GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
   GameProps.menu = new TMenu(spcvs); 
 
-  //newGame(); 
-  GameProps.menu.hideStuff();
-  requestAnimationFrame(drawGame);
+  GameProps.menu.hideStuff(); //Hides everything except play when the game loads in
+  requestAnimationFrame(drawGame); //animates the game
   
   console.log("Game canvas is rendering!");
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
@@ -141,7 +145,7 @@ function drawGame() {
   // Clear the canvas
   spcvs.clearCanvas();
 
-  switch (GameProps.gameStatus) {
+  switch (GameProps.gameStatus) { //Draws the games in the different EgameStatuses
     case EGameStatus.Idle:
       GameProps.menu.draw();
       break; 
@@ -170,10 +174,11 @@ function updateGame() {
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
         console.log("Game over!");
+        GameProps.sounds.running.stop(); 
          if (!GameProps.soundMuted) {
 
-          GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-          GameProps.sounds.gameOver.play(); // Play the game over sound
+          GameProps.sounds.gameOver.stop(); //Stopping the music to reset it, or else it will not play
+          GameProps.sounds.gameOver.play(); // Plays the game over sound
         } 
         GameProps.sounds.running.stop();
         GameProps.menu.gameOver(); 
@@ -182,12 +187,18 @@ function updateGame() {
       GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); 
 
       break;
+    case EGameStatus.GameOver:
+      GameProps.sounds.running.stop();
+      break; 
+
   }
 }
 
 function increaseGameSpeed() {
    gameSpeed += 0.5; //adding speed
   console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
+  clearInterval(hndUpdateGame); 
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -195,23 +206,24 @@ function increaseGameSpeed() {
 //-----------------------------------------------------------------------------------------
 
 
-function setSoundOnOff() { //Tatt fra FlappyBird, sjekker om lyden er muted eller på 
+function setSoundOnOff() { //Reused from Flappybird, checks if the sound is muted or not 
   if (chkMuteSound.checked) {
     GameProps.soundMuted = true;
-    GameProps.sounds.running.stop();
+    GameProps.sounds.running.pause();
     console.log("Sound muted");
   } else {
     GameProps.soundMuted = false;
-    if(GameProps.gameStatus === EGameStatus.Playing){
-       startMusic(); //starter kun musikk når man spiller spillet, selv ved når man trykker mute og unmute
+    if((GameProps.gameStatus === EGameStatus.Playing || GameProps.gameStatus === EGameStatus.Pause) && 
+      (GameProps.gameStatus !== EGameStatus.Idle || GameProps.gameStatus !== EGameStatus.GameOver)){
+       GameProps.sounds.running.play(); //Starts the music only when one is playing the game, it restarts when you mute/unmute it
     } //
     console.log("Sound on");
   }
 } // end of setSoundOnOff
 
-//her var startMusic
 
-function onKeyDown(event) {
+
+function onKeyDown(event) { //the controls of the snake
   switch (event.key) {
     case "ArrowUp":
       GameProps.snake.setDirection(EDirection.Up);
@@ -229,6 +241,7 @@ function onKeyDown(event) {
       console.log("Space key pressed!");
       /* Pause the game logic here */
       GameProps.menu.togglePause(); 
+      event.preventDefault();
       
       break;
     default:
