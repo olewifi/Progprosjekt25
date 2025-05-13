@@ -553,18 +553,19 @@ class TSpriteNumber {
   #visible;
   #scale;
   #alpha;
-  constructor(aSpriteCanvas, aSpriteInfo, aPosition, aShapeClass) {
+  constructor(aSpriteCanvas, aSpriteInfo, aPosition, aShapeClass, aAlpha) {
     this.#spcvs = aSpriteCanvas;
     this.#spi = aSpriteInfo;
     this.#position = aPosition;
     this.#shapeClass = aShapeClass;
+    this.#alpha = aAlpha;
     this.#value = 0;
     this.digits = 0; //if Digit is 0, then the number of digits is the length of the value
     this.#spNumbers = [];
     this.#justify = ESpriteNumberJustifyType.Left;
     this.#visible = true;
     this.#scale = 1.0;
-    this.#alpha = 1.0;
+    //this.#alpha = 1.0;
     this.value = 0;
   }
 

@@ -1,7 +1,4 @@
 "use strict";
-
-
-"use strict";
 /* Use this file to create the menu for the snake game. */
 import libSprite_v2 from "./libSprite_v2.mjs";
 import lib2d_v2 from "./lib2d_v2.mjs";
@@ -13,7 +10,8 @@ import {
   startMusic,
 } from "./game.mjs";
 
-export class TMenu {
+
+export class TMenu { //TMenu class to place menu information
   #spButtonPlay;
   #spButtonGameOver;
   #spButtonHome;
@@ -24,7 +22,7 @@ export class TMenu {
   #spBaitScore;
   
   constructor(aSpriteCanvas) {
-    //get position for button to be in the middle of the canvas
+    //Position for button to be in the middle of the canvas
     const pos = new lib2d_v2.TPosition(
       aSpriteCanvas.canvas.width / 2 - SheetData.Play.width / 2,
       aSpriteCanvas.canvas.height / 2 - SheetData.Play.height / 2
@@ -35,12 +33,14 @@ export class TMenu {
       SheetData.Play,
       pos
     );
-    this.#spButtonPlay.animateSpeed = 45;
+    this.#spButtonPlay.animateSpeed = 45; //Animating the play button
     this.#spButtonPlay.onClick = () => {
       newGame();
       this.#spButtonPlay.visible = false; 
       this.#spBaitScore.visible = true; 
       this.#spCurrentScore.visible = true; 
+      //GameProps.sounds.running.start(); 
+      
        
     };
 
@@ -49,9 +49,12 @@ export class TMenu {
       SheetData.Resume,
       pos
     );
-    this.#spButtonPause.animateSpeed = 45;
+    this.#spButtonPause.animateSpeed = 45; //animating pause button
     this.#spButtonPause.onClick = () => {
       this.togglePause();
+      
+      
+    
     };
 
     pos.x = 95; 
@@ -91,9 +94,10 @@ export class TMenu {
       aSpriteCanvas,
       SheetData.GameOver,
       pos
-    );
+    ); 
+    
 
-    const currentScorePos = new lib2d_v2.TPosition(
+    const currentScorePos = new lib2d_v2.TPosition( //placing the scores
       0,
       0
     )
@@ -102,7 +106,7 @@ export class TMenu {
         SheetData.Number,
         currentScorePos
     );
-    this.#spCurrentScore.alpha = 0.7; 
+    this.#spCurrentScore.alpha = 0.5; //Changing the opacity to make it more transparent
     const baitScorePos = new lib2d_v2.TPosition(
       750,
       0
@@ -112,7 +116,7 @@ export class TMenu {
       SheetData.Number,
       baitScorePos
     );
-    this.#spBaitScore.alpha = 0.7; 
+    this.#spBaitScore.alpha = 0.5; 
     const scorePos = new lib2d_v2.TPosition(
       520,
       269
@@ -125,20 +129,17 @@ export class TMenu {
     );
   }
 
-homeButton(){ //her blir play visible når du trykker på home og alt annet er usynlig 
+homeButton(){ //Play button becomes visible when you press home and everything else becomes invisible 
   GameProps.gameStatus = EGameStatus.Idle;
   this.#spButtonPlay.visible = true;
   this.#spButtonHome.visible = false;
   this.#spButtonRetry.visible = false;
   this.#spButtonGameOver.visible = false;
   this.#spButtonPause.visible = false; 
-   this.#spScore.visible = false; 
- // this.spBaitScore.visible = false; 
- // this.spCurrentScore.visible = false; 
-  //this.spScore.visible = false; 
+  this.#spScore.visible = false; 
 }
 
-draw() { //her tegnes ting som er visible 
+draw() { //Draws things that is visible 
   
   this.#spButtonGameOver.draw();
   this.#spButtonHome.draw(); 
@@ -150,19 +151,18 @@ draw() { //her tegnes ting som er visible
   this.#spScore.draw(); 
   }
 
-
-gameOver(){  
+gameOver(){  //changes visibility to show endscreen
   this.#spButtonGameOver.visible = true;
   this.#spButtonRetry.visible = true;
   this.#spButtonHome.visible = true;
   this.#spScore.visible = true; 
   this.#spBaitScore.visible = false;
   this.#spCurrentScore.visible = false; 
+
   
 }
 
-
-hideStuff() { //hjemmer alt utennom play når spillet lastes 
+hideStuff() { //Hides everything except play when the game loads in 
   this.#spButtonPlay.visible = true; 
   this.#spButtonPause.visible = false; 
   this.#spButtonRetry.visible = false; 
@@ -173,24 +173,26 @@ hideStuff() { //hjemmer alt utennom play når spillet lastes
   this.#spScore.visible = false; 
 }
 
-updateScore(baitScore, totalScore){
+updateScore(baitScore, totalScore){ //Updates the different scores 
   this.#spCurrentScore.value = totalScore;
   this.#spBaitScore.value = baitScore;
   this.#spScore.value = totalScore; 
 }
 
-togglePause(){ //toggler pause + musikk 
+togglePause(){ //toggler pause and music
   if(GameProps.gameStatus === EGameStatus.Playing) {
     GameProps.gameStatus = EGameStatus.Pause;
-    GameProps.isRunningSoundPlaying = false;
-    GameProps.sounds.running.stop();
+    //GameProps.isRunningSoundPlaying = true; //false orginalt
+   // GameProps.sounds.running.stop();
     
   } else if(GameProps.gameStatus === EGameStatus.Pause) {
     GameProps.gameStatus = EGameStatus.Playing;
+    GameProps.sounds.running;
     GameProps.isRunningSoundPlaying = true;
-    startMusic();
+    GameProps.sounds.running.play();
   }
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
+  
 }
 
 }
