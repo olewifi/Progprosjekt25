@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------------------
 import libSprite from "./libSprite_v2.mjs";
 import lib2D from "./lib2d_v2.mjs";
-import { GameProps, SheetData, bateIsEaten } from "./game.mjs"
+import { GameProps, SheetData, bateIsEaten, } from "./game.mjs"
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
 
 //------------------------------------------------------------------------------------------
@@ -78,12 +78,11 @@ class TSnakeHead extends TSnakePart {
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
       bateIsEaten();
     }else{
-    /* Decrease the score if the snake head is not on a bait cell */
-     if(GameProps.baitScore > 1){
+      /* Decrease the score if the snake head is not on a bait cell */
+      if(GameProps.baitScore > 1){
         GameProps.baitScore--;
       }
     }
-
     boardCellInfo.infoType = EBoardCellInfoType.Snake; // Set the cell to Snake
     return true; // No collision, continue
   }
@@ -251,7 +250,7 @@ export class TSnake {
       for (let i = 0; i < this.#body.length; i++) {
         this.#body[i].update();
         }
-      if (!this.#grow) { // We check it the snake isent growing, if this is the case we move the tail to follow the rest of the snake
+      if (!this.#grow) { // We check it the snake isn't growing, if this is the case we move the tail to follow the rest of the snake
         this.#tail.update(); 
       } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesent grow on the next move
       this.#grow = false; 
@@ -266,12 +265,11 @@ export class TSnake {
   setDirection(aDirection) {
     this.#head.setDirection(aDirection);
   } 
-
-  addSnakePart() { //vi lager en addSnakePart funksjon, har fått noen inspill fra ChatGpt med noe omskrivning for mer simplisitet
-    //delt med Helene/ annen elev 
+  
+  addSnakePart() { //AddSnakepart function, help from ChatGPT but writing the code to be more simple and understandable. This code has been shared with the group 5678
     let partToCopy; //we first pick which part of the snake to Copy
     if (this.#body.length > 0) {
-      partToCopy = this.#body[this.#body.length - 1]; // So if the snake has body parts,we copy the last one 
+      partToCopy = this.#body[this.#body.length - 1]; // So if the snake has body parts, we copy the last one 
       } 
     let newBodyPart = partToCopy.clone(); //Now we can make a new body part by copying the chosen part using the clone function from TSnakeBody class
 
@@ -279,14 +277,12 @@ export class TSnake {
     newBodyPart.boardCell = new TBoardCell(this.#tail.boardCell.col, this.#tail.boardCell.row);  
     newBodyPart.direction = this.#tail.direction;
 
-    // Update the game board for the new body part
+    // Update the gameboard for the new body part
     GameProps.gameBoard.getCell(newBodyPart.boardCell.row, newBodyPart.boardCell.col).infoType = EBoardCellInfoType.Snake;
     GameProps.gameBoard.getCell(newBodyPart.boardCell.row, newBodyPart.boardCell.col).direction = newBodyPart.direction;
 
     // Add the new body part to the body array
     this.#body.push(newBodyPart);
-    this.#grow = true;// Set grow flag to prevent tail from moving in the next update
+    this.#grow = true;// Set grow to prevent tail from moving in the next update
   }
-
-
 }

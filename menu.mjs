@@ -7,12 +7,10 @@ import {
   GameProps,
   SheetData,
   newGame,
-  playSound,
+  startMusic,
 } from "./game.mjs";
-import { GameBoardSize, EBoardCellInfoType, TGameBoard } from "./gameBoard.mjs";
-import { TSnake } from "./snake.mjs";
 
-export class TMenu {
+export class TMenu { //TMenu class to place menu information
   #spButtonPlay;
   #spButtonGameOver;
   #spButtonHome;
@@ -21,9 +19,9 @@ export class TMenu {
   #spScore;
   #spCurrentScore;
   #spBaitScore;
-
+  
   constructor(aSpriteCanvas) {
-    //get position for button to be in the middle of the canvas
+    //Position for button to be in the middle of the canvas
     const pos = new lib2d_v2.TPosition(
       aSpriteCanvas.canvas.width / 2 - SheetData.Play.width / 2,
       aSpriteCanvas.canvas.height / 2 - SheetData.Play.height / 2
@@ -34,12 +32,13 @@ export class TMenu {
       SheetData.Play,
       pos
     );
-    this.#spButtonPlay.animateSpeed = 45;
+    this.#spButtonPlay.animateSpeed = 45; //Animating the play button
     this.#spButtonPlay.onClick = () => {
       newGame();
-      GameProps.gameStatus = EGameStatus.Playing;
-      console.log("Game started");
-      GameProps.sounds.running.play();
+      this.#spButtonPlay.visible = false; 
+      this.#spBaitScore.visible = true; 
+      this.#spCurrentScore.visible = true; 
+       
     };
 
     this.#spButtonPause = new libSprite_v2.TSpriteButton(
@@ -47,9 +46,9 @@ export class TMenu {
       SheetData.Resume,
       pos
     );
-    this.#spButtonPause.animateSpeed = 45;
+    this.#spButtonPause.animateSpeed = 45; //animating pause button
     this.#spButtonPause.onClick = () => {
-      GameProps.gameStatus = EGameStatus.Playing;
+      this.togglePause();
     };
 
     pos.x = 95; 
@@ -60,7 +59,8 @@ export class TMenu {
       pos
     );
     this.#spButtonHome.onClick = () => {
-      GameProps.gameStatus = EGameStatus.Idle;
+      this.homeButton();
+  
     };
 
     pos.x = 645;
@@ -70,10 +70,18 @@ export class TMenu {
       SheetData.Retry,
       pos
     );
+
+    
     this.#spButtonRetry.onClick = () => {
       newGame();
-      GameProps.gameStatus = EGameStatus.Playing;
+      this.hideStuff();
+      this.#spButtonRetry.visible = false;
+      this.#spButtonPlay.visible = false;
+      this.#spScore.visible = false; 
+      this.#spCurrentScore.visible = true; 
+      this.#spBaitScore.visible = true; 
     };
+
     pos.x = 30;
     pos.y = 50;
     this.#spButtonGameOver = new libSprite_v2.TSprite(
@@ -81,161 +89,100 @@ export class TMenu {
       SheetData.GameOver,
       pos
     );
-    const currentScorePos = new lib2d_v2.TPosition(
+
+    const currentScorePos = new lib2d_v2.TPosition( //placing the scores
       0,
       0
     )
     this.#spCurrentScore = new libSprite_v2.TSpriteNumber(
         aSpriteCanvas,
         SheetData.Number,
-        currentScorePos,
-        null,
-        0.7
+        currentScorePos
     );
+    this.#spCurrentScore.alpha = 0.5; //Changing the opacity to make it more transparent
     const baitScorePos = new lib2d_v2.TPosition(
-      0,
-      100
+      750,
+      0
     )
     this.#spBaitScore = new libSprite_v2.TSpriteNumber(
       aSpriteCanvas,
       SheetData.Number,
-      baitScorePos,
-      null,
-      0.7
+      baitScorePos
     );
+    this.#spBaitScore.alpha = 0.5; 
     const scorePos = new lib2d_v2.TPosition(
       520,
       269
     )
    
-
     this.#spScore = new libSprite_v2.TSpriteNumber(
         aSpriteCanvas,
         SheetData.Number,
-        scorePos,
-        null,
-        1.0
+        scorePos
     );
   }
 
+homeButton(){ //Play button becomes visible when you press home and everything else becomes invisible 
+  GameProps.gameStatus = EGameStatus.Idle;
+  this.#spButtonPlay.visible = true;
+  this.#spButtonHome.visible = false;
+  this.#spButtonRetry.visible = false;
+  this.#spButtonGameOver.visible = false;
+  this.#spButtonPause.visible = false; 
+  this.#spScore.visible = false; 
+}
 
-  draw() { //Alle knapper har visable lik false og true, bruker dermed disse for å skjule knapper når de ikke er på skjermen
-    switch (GameProps.gameStatus){
-      case EGameStatus.Idle:
-        this.#spButtonPlay.draw();
-        this.#spButtonPause.visible = false; 
-        this.#spButtonHome.visible = false; 
-        break;
-        
-      case EGameStatus.Playing:
-        //i want the music running to be here during the game and i want it to loop. the song enda after 2.33 minutes. 
-        //playSound(GameProps.sounds.running); // Play sound when game starts
-        //const MusicRunning = GameProps.sounds.running; // Play sound when game starts
+draw() { //Draws things that is visible 
   
-        this.#spButtonPlay.visible = false; 
-        this.#spButtonHome.visible = false;
-        this.#spButtonRetry.visible = false;
-        this.#spButtonPause.visible = false;
-
-        this.#spCurrentScore.value = GameProps.totalScore;
-        this.#spCurrentScore.draw();
-        this.#spBaitScore.value = GameProps.baitScore;
-        this.#spBaitScore.draw();
-        
-        break;
-
-      case EGameStatus.Pause:
-        GameProps.sounds.running.pause();
-
-        this.#spButtonPause.draw();
-
-        this.#spButtonPlay.visible = false;
-        this.#spButtonHome.visible = false;
-        this.#spButtonRetry.visible = false;
-        break;
-
-      case EGameStatus.GameOver:
-        GameProps.sounds.running.stop(); 
-        this.#spCurrentScore.visible = false;
-
-        this.#spButtonGameOver.draw();
-        this.#spButtonHome.draw(); 
-        this.#spButtonRetry.draw(); 
-
-        this.#spButtonPause.visible = false; 
-        this.#spButtonPlay.visible = true;
-        this.#spButtonHome.visible = true; 
-        this.#spButtonRetry.visible = true;
-
-        this.#spScore.value = GameProps.totalScore;
-        this.#spScore.draw();
-        break;
-    }
-  }
-
-    /*
-
-draw(){
-  this.#spButtonPlay.draw();
-  this.#spButtonPause.draw();
   this.#spButtonGameOver.draw();
-  this.#spButtonHome.draw();
-  this.#spButtonRetry.draw();
-  this.#spButtonResume.draw(); 
-
-
-  switch(GameProps.gameStatus) {
-    case EGameStatus.Idle:
-      this.#spButtonPlay.visible = true; 
-      this.#spButtonPause.visible = false; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.Playing:
-      this.#spButtonPlay.visible = false; 
-      this.#spButtonPause.visible = true; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.Pause:
-      this.#spButtonPlay.visible = false; 
-      this.#spButtonPause.visible = true; 
-      this.#spButtonGameOver.visible = false; 
-      this.#spButtonHome.visible = false; 
-      this.#spButtonRetry.visible = false; 
-      break;
-    case EGameStatus.GameOver:
-      this.#spButtonPlay.visible = true; 
-      this.#spButtonPause.visible = false; 
-      this.#spButtonGameOver.visible = true; 
-      this.#spButtonHome.visible = true; 
-      this.#spButtonRetry.visible = true; 
-      break;
+  this.#spButtonHome.draw(); 
+  this.#spButtonPlay.draw(); 
+  this.#spButtonPause.draw(); 
+  this.#spButtonRetry.draw(); 
+  this.#spBaitScore.draw(); 
+  this.#spCurrentScore.draw();
+  this.#spScore.draw(); 
   }
 
-  togglePause() {
-    if (GameProps.gameStatus === EGameStatus.Pause) {
-      GameProps.gameStatus === EGameStatus.Playing;
-    } else if (GameProps.gameStatus === EGameStatus.Pause)
-      GameProps.gameStatus === EGameStatus.Playing;
-    }
-    this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
-
+gameOver(){  //changes visibility to show endscreen
+  this.#spButtonGameOver.visible = true;
+  this.#spButtonRetry.visible = true;
+  this.#spButtonHome.visible = true;
+  this.#spScore.visible = true; 
+  this.#spBaitScore.visible = false;
+  this.#spCurrentScore.visible = false; 
+  
 }
+
+hideStuff() { //Hides everything except play when the game loads in 
+  this.#spButtonPlay.visible = true; 
+  this.#spButtonPause.visible = false; 
+  this.#spButtonRetry.visible = false; 
+  this.#spButtonHome.visible = false; 
+  this.#spButtonGameOver.visible = false;
+  this.#spBaitScore.visible = false; 
+  this.#spCurrentScore.visible = false; 
+  this.#spScore.visible = false; 
 }
-*/
-//end of TMenu
 
+updateScore(baitScore, totalScore){ //Updates the different scores 
+  this.#spCurrentScore.value = totalScore;
+  this.#spBaitScore.value = baitScore;
+  this.#spScore.value = totalScore; 
+}
 
-togglePause(){
+togglePause(){ //toggler pause and music
   if(GameProps.gameStatus === EGameStatus.Playing) {
     GameProps.gameStatus = EGameStatus.Pause;
+    GameProps.isRunningSoundPlaying = false;
+    GameProps.sounds.running.stop();
+    
   } else if(GameProps.gameStatus === EGameStatus.Pause) {
     GameProps.gameStatus = EGameStatus.Playing;
+    GameProps.isRunningSoundPlaying = true;
+    startMusic();
   }
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
-  
 }
-}//End of TMenu
+
+}

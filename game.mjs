@@ -1,26 +1,21 @@
 "use strict";
 
-//Bugs
-//mute button når man refresher siden
-
 //-----------------------------------------------------------------------------------------
 //----------- Import modules, mjs files  ---------------------------------------------------
 //-----------------------------------------------------------------------------------------
 import libSound from "./libSound.mjs";
 import libSprite from "./libSprite_v2.mjs";
-import lib2d_v2 from "./lib2d_v2.mjs";
 import { TGameBoard, GameBoardSize, TBoardCell } from "./gameBoard.mjs";
 import { TSnake, EDirection, } from "./snake.mjs";
 import { TBait } from "./bait.mjs";
-import { TMenu } from "./menu.mjs"; //ikke tenk på denne enda 
-import libSprite_v2 from "./libSprite_v2.mjs";
+import { TMenu } from "./menu.mjs";
 
 //-----------------------------------------------------------------------------------------
 //----------- variables and object --------------------------------------------------------
 //-----------------------------------------------------------------------------------------
 const chkMuteSound = document.getElementById("chkMuteSound");
 const cvs = document.getElementById("cvs");
-const spcvs = new libSprite.TSpriteCanvas(cvs);; 
+const spcvs = new libSprite.TSpriteCanvas(cvs);
 let gameSpeed = 4; // Game speed multiplier;
 let hndUpdateGame = null;
 export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 };
@@ -42,11 +37,11 @@ export const SheetData = {
 export const GameProps = {
   soundMuted: false,
   gameBoard: null,
-  gameStatus: EGameStatus.idle,
+  gameStatus: EGameStatus.Idle,
   snake: null,
   bait: null,
   menu: null, 
-  sounds:{food:null, running:null, gameOver:null},
+  sounds:{food:null, running:null, gameOver:null}, 
   totalScore: 0,
   baitScore: 50,
 };
@@ -55,42 +50,61 @@ export const GameProps = {
 //----------- Exported functions -----------------------------------------------------------
 //------------------------------------------------------------------------------------------
 
-export function playSound(aSound) { //Importert fra FlappyBird
-  if (!GameProps.soundMuted) {
-    aSound.play();
-  } else {
-    aSound.pause();
-  }
-}
 
 export function newGame() {
   GameProps.gameBoard = new TGameBoard();
   GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
   GameProps.bait = new TBait(spcvs); // Initialize bait with a starting position
-  gameSpeed = 4; // Reset game speed
-  GameProps.totalScore = 0;
+  gameSpeed = 4; // Reset gamespeed
+  GameProps.totalScore = 0; 
+  GameProps.baitScore = 50;
+  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //Updates the scores value befor we show them
+
+  setSoundOnOff(); //When new game, check if sound is muted
+  GameProps.gameStatus = EGameStatus.Playing; 
+  console.log("Game started");
+  startMusic();
+  clearInterval(hndUpdateGame); 
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
+}
+
+export function startMusic() { //Starts music when going out of the states of unpaused, unmuted and start game 
+  // Resets music
+  if (!GameProps.soundMuted) {
+    GameProps.sounds.running.stop();
+    GameProps.sounds.running.play();
+    console.log("Music playing"); 
+
+    clearInterval();
+    setInterval(() => {
+      if (!GameProps.soundMuted) {
+        GameProps.sounds.running.stop();
+        GameProps.sounds.running.play(); 
+      }
+    }, 153000); // 2.33 minutes in milliseconds
+
+    GameProps.isRunningSoundPlaying = true;
+  }
 }
 
 export function bateIsEaten() {
 
   console.log("Bait eaten!");
-  playSound(GameProps.sounds.food); 
-  GameProps.sounds.food.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-  playSound(GameProps.sounds.food); 
+  GameProps.sounds.food.stop(); //Must stop the music to rest, or else it will not play
+  if(!GameProps.soundMuted){
+  GameProps.sounds.food.play(); //Plays when not muted 
+  }
+  increaseGameSpeed(); // Increase game speed
+  GameProps.snake.addSnakePart(); //Increase snake size
 
-
-  /* Logic to increase the snake size and score when bait is eaten */
-  //Increase snake size
-  GameProps.snake.addSnakePart(); 
-  
   //Increase score when bait is eaten//
   GameProps.totalScore += GameProps.baitScore;
   console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
-  //resetting baitscore
-  GameProps.baitScore = 50;
-  GameProps.bait.update(); 
-  increaseGameSpeed(); // Increase game speed
+ 
+  GameProps.baitScore = 50;  //Resetting baitscore
+  GameProps.bait.update();  //Moves bait
 }
+
 
 //------------------------------------------------------------------------------------------
 //----------- functions -------------------------------------------------------------------
@@ -102,12 +116,10 @@ function loadGame() {
 
 
   GameProps.gameStatus = EGameStatus.Idle; // change game status to Idle
- //GameProps.menu.onClick = EGameStatus.Playing; 
   GameProps.menu = new TMenu(spcvs); 
 
-  //newGame(); 
-
-  requestAnimationFrame(drawGame);
+  GameProps.menu.hideStuff(); //Hides everything except play when the game loads in
+  requestAnimationFrame(drawGame); //animates the game
   
   console.log("Game canvas is rendering!");
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
@@ -117,7 +129,6 @@ function loadGame() {
   GameProps.sounds.food = new libSound.TSoundFile("./Music/food.mp3");
   GameProps.sounds.running = new libSound.TSoundFile("./Music/running.mp3");
   GameProps.sounds.gameOver = new libSound.TSoundFile("./Music/heroIsDead.mp3");
-
 }
 
 
@@ -125,7 +136,7 @@ function drawGame() {
   // Clear the canvas
   spcvs.clearCanvas();
 
-  switch (GameProps.gameStatus) {
+  switch (GameProps.gameStatus) { //Draws the games in the different EgameStatuses
     case EGameStatus.Idle:
       GameProps.menu.draw();
       break; 
@@ -153,20 +164,27 @@ function updateGame() {
     case EGameStatus.Playing:
       if (!GameProps.snake.update()) {
         GameProps.gameStatus = EGameStatus.GameOver;
-       // GameProps.snake.gameSpeed= 0; //Stop the snake den virker som sagt til å forsvinne atm but still 
         console.log("Game over!");
-        playSound(GameProps.sounds.gameOver);
-        GameProps.sounds.gameOver.stop(); // må stoppe musikken for å resete, ellers vil den ikke spilles igjen
-        playSound(GameProps.sounds.gameOver); // Play the game over sound
+         if (!GameProps.soundMuted) {
+
+          GameProps.sounds.gameOver.stop(); //Stopping the music to reset it, or else it will not play
+          GameProps.sounds.gameOver.play(); // Plays the game over sound
+        } 
+        GameProps.sounds.running.stop();
+        GameProps.menu.gameOver(); 
+
       }
+      GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); 
+
       break;
   }
 }
 
 function increaseGameSpeed() {
-  /* Increase game speed logic here */
-  gameSpeed += 0.5; //adding speed
+   gameSpeed += 0.5; //adding speed
   console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
+  clearInterval(hndUpdateGame); 
+  hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
 }
 
 //-----------------------------------------------------------------------------------------
@@ -174,18 +192,21 @@ function increaseGameSpeed() {
 //-----------------------------------------------------------------------------------------
 
 
-function setSoundOnOff() { //Tatt fra FlappyBird
+function setSoundOnOff() { //Reused from Flappybird, checks if the sound is muted or not 
   if (chkMuteSound.checked) {
     GameProps.soundMuted = true;
-
+    GameProps.sounds.running.stop();
     console.log("Sound muted");
   } else {
     GameProps.soundMuted = false;
+    if(GameProps.gameStatus === EGameStatus.Playing){
+       startMusic(); //Starts the music only when one is playing the game, it restarts when you mute/unmute it
+    } //
     console.log("Sound on");
   }
 } // end of setSoundOnOff
 
-function onKeyDown(event) {
+function onKeyDown(event) { //the controls of the snake
   switch (event.key) {
     case "ArrowUp":
       GameProps.snake.setDirection(EDirection.Up);
