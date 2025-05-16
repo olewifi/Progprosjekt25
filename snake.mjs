@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------------------
 import libSprite from "./libSprite_v2.mjs";
 import lib2D from "./lib2d_v2.mjs";
-import { GameProps, SheetData, bateIsEaten, } from "./game.mjs"
+import { GameProps, SheetData, bateIsEaten, GoldBaitIsEaten } from "./game.mjs"
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
 
 //------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class TSnakePart extends libSprite.TSprite {
 
 class TSnakeHead extends TSnakePart {
   constructor(aSpriteCanvas, aBoardCell) {
-    super(aSpriteCanvas, SheetData.Head, aBoardCell);
+    super(aSpriteCanvas, GameProps.SnakeColourSpriteHead, aBoardCell);
     this.newDirection = this.direction;
   }
 
@@ -73,9 +73,10 @@ class TSnakeHead extends TSnakePart {
     }
     // Update the position of the snake element (subclass)
     super.update();
-    //Check if the snake head is on a bait cell
+    //Check if the snake head is on a snake cell
     const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
+      GameProps.BaitEatenCounter++;
       bateIsEaten();
     }else{
       /* Decrease the score if the snake head is not on a bait cell */
@@ -83,6 +84,16 @@ class TSnakeHead extends TSnakePart {
         GameProps.baitScore--;
       }
     }
+    if(boardCellInfo.infoType === EBoardCellInfoType.GoldenBait && GameProps.GoldenBait.visible === true) {
+      console.log("Golden bait is eaten yay! you got: " + GameProps.GoldenBaitScore);
+      GoldBaitIsEaten();
+    }else{
+      if(GameProps.GoldenBait.visible === true && GameProps.GoldenBaitCountdown > 0 ){
+        GameProps.GoldenBaitCountdown--;
+        console.log(GameProps.GoldenBaitCountdown);
+        }
+      }
+    
     boardCellInfo.infoType = EBoardCellInfoType.Snake; // Set the cell to Snake
     return true; // No collision, continue
   }
@@ -99,7 +110,7 @@ class TSnakeHead extends TSnakePart {
 
 class TSnakeBody extends TSnakePart {
   constructor(aSpriteCanvas, aBoardCell ) {
-    super(aSpriteCanvas, SheetData.Body, aBoardCell);
+    super(aSpriteCanvas, GameProps.SnakeColourSpriteBody, aBoardCell);
     this.index = ESpriteIndex.RL;    
   }
 
@@ -189,7 +200,7 @@ class TSnakeBody extends TSnakePart {
 
 class TSnakeTail extends TSnakePart {
   constructor(aSpriteCanvas,aBoardCell) {
-    super(aSpriteCanvas, SheetData.Tail, aBoardCell);
+    super(aSpriteCanvas, GameProps.SnakeColourSpriteTail, aBoardCell);
   }
 
   update(){

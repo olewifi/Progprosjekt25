@@ -33,3 +33,26 @@ export class TBait extends libSprite.TSprite {
   } // End of update
 
 }
+
+export class TGoldenBait extends libSprite.TSprite {
+  #boardCell = null;
+  constructor(aSpriteCanvas) {
+    const pos = new lib2D.TPoint(0, 0);
+    super(aSpriteCanvas, SheetData.Bait_2, pos);
+    this.#boardCell = new TBoardCell(0, 0);
+    this.update();
+  } // End of constructor
+
+  update() {
+    // Move the Goldenbait to a random empty cell on the game board
+    do{
+      this.#boardCell.col = Math.floor(Math.random() * GameProps.gameBoard.cols);
+      this.#boardCell.row = Math.floor(Math.random() * GameProps.gameBoard.rows);
+    }while(GameProps.gameBoard.getCell(this.#boardCell.row, this.#boardCell.col).infoType !== EBoardCellInfoType.Empty);
+    this.x = this.#boardCell.col * this.spi.width;
+    this.y = this.#boardCell.row * this.spi.height;
+    // Update the bait cell info type to GoldenBait
+    GameProps.gameBoard.getCell(this.#boardCell.row, this.#boardCell.col).infoType = EBoardCellInfoType.GoldenBait
+  } // End of update
+
+}

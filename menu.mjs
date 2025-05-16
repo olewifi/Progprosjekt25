@@ -7,7 +7,6 @@ import {
   GameProps,
   SheetData,
   newGame,
-  startMusic,
 } from "./game.mjs";
 
 export class TMenu { //TMenu class to place menu information
@@ -101,7 +100,7 @@ export class TMenu { //TMenu class to place menu information
     );
     this.#spCurrentScore.alpha = 0.5; //Changing the opacity to make it more transparent
     const baitScorePos = new lib2d_v2.TPosition(
-      750,
+      780,
       0
     )
     this.#spBaitScore = new libSprite_v2.TSpriteNumber(
@@ -110,8 +109,9 @@ export class TMenu { //TMenu class to place menu information
       baitScorePos
     );
     this.#spBaitScore.alpha = 0.5; 
+    this.#spBaitScore.scale = 0.8;
     const scorePos = new lib2d_v2.TPosition(
-      520,
+      550,
       269
     )
    
@@ -174,15 +174,13 @@ updateScore(baitScore, totalScore){ //Updates the different scores
 togglePause(){ //toggler pause and music
   if(GameProps.gameStatus === EGameStatus.Playing) {
     GameProps.gameStatus = EGameStatus.Pause;
-    GameProps.isRunningSoundPlaying = false;
-    GameProps.sounds.running.stop();
     
   } else if(GameProps.gameStatus === EGameStatus.Pause) {
     GameProps.gameStatus = EGameStatus.Playing;
+    GameProps.sounds.running;
     GameProps.isRunningSoundPlaying = true;
-    startMusic();
+    GameProps.sounds.running.play(); 
   }
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
-}
-
+  } 
 }

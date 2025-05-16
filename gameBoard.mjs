@@ -5,7 +5,7 @@ import { EDirection } from "./snake.mjs";
 
 export const GameBoardSize = { Cols: 24, Rows: 18 };
 
-export const EBoardCellInfoType = { Empty: 0, Snake: 1, Bait: 2 };
+export const EBoardCellInfoType = { Empty: 0, Snake: 1, Bait: 2, GoldenBait: 3 };
 
 export class TBoardCell {
   constructor(aCol, aRow) {

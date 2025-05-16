@@ -1,0 +1,8 @@
+Gruppe 4534
+
+Utover oppgaven vil det bli sett at gruppen refererer til Flappybird. 
+Dette er en spilloppgave gruppen har hatt gjennom semesteret, gjort sammen med foreleser. 
+Her er det hentet noen ideer,inspirasjon og kode, som sett i kommentarene i snaike koden.  
+Musikk og lyd er også hentet fra Flappybird og brukt i denne oppgaven. 
+
+Når det kommer til spritesheetsene, har gruppen utvidet spritsheetsene fra orginale spritesheets, for å ha mulighet til å skifte farge på slange og eplet. 
