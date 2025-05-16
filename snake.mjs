@@ -4,15 +4,13 @@
 //------------------------------------------------------------------------------------------
 import libSprite from "./libSprite_v2.mjs";
 import lib2D from "./lib2d_v2.mjs";
-import { GameProps, SheetData, bateIsEaten, GoldBaitIsEaten } from "./game.mjs"
+import { GameProps, bateIsEaten, GoldBaitIsEaten } from "./game.mjs"
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
-
 //------------------------------------------------------------------------------------------
 //----------- variables and object ---------------------------------------------------------
 //------------------------------------------------------------------------------------------
 const ESpriteIndex = {UR: 0, LD: 0, RU: 1, DR: 1, DL: 2, LU: 2, RD: 3, UL: 3, RL: 4, UD: 5};
 export const EDirection = { Up: 0, Right: 1, Left: 2, Down: 3 };
-
 
 //-----------------------------------------------------------------------------------------
 //----------- Classes ---------------------------------------------------------------------
@@ -38,7 +36,7 @@ class TSnakePart extends libSprite.TSprite {
 
 class TSnakeHead extends TSnakePart {
   constructor(aSpriteCanvas, aBoardCell) {
-    super(aSpriteCanvas, GameProps.SnakeColourSpriteHead, aBoardCell);
+    super(aSpriteCanvas, GameProps.SnakeColourSpriteHead, aBoardCell); //SnakeColourSpriteHead collects the information if the snake is green or purple
     this.newDirection = this.direction;
   }
 
@@ -85,7 +83,7 @@ class TSnakeHead extends TSnakePart {
       }
     }
     if(boardCellInfo.infoType === EBoardCellInfoType.GoldenBait && GameProps.GoldenBait.visible === true) {
-      console.log("Golden bait is eaten yay! you got: " + GameProps.GoldenBaitScore);
+      //console.log("Golden bait is eaten yay! you got: " + GameProps.GoldenBaitScore);
       GoldBaitIsEaten();
     }else{
       if(GameProps.GoldenBait.visible === true && GameProps.GoldenBaitCountdown > 0 ){
@@ -263,7 +261,7 @@ export class TSnake {
         }
       if (!this.#grow) { // We check it the snake isn't growing, if this is the case we move the tail to follow the rest of the snake
         this.#tail.update(); 
-      } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesent grow on the next move
+      } else { //And if the snake IS growing, we dont move the tail, reseting the grow flag to false so that the snake doesen't grow on the next move
       this.#grow = false; 
     }  
     }else if(!this.#isDead){
@@ -277,7 +275,7 @@ export class TSnake {
     this.#head.setDirection(aDirection);
   } 
   
-  addSnakePart() { //AddSnakepart function, help from ChatGPT but writing the code to be more simple and understandable. This code has been shared with the group 5678
+  addSnakePart() { //AddSnakepart function, help from ChatGPT but writing the code to be more simple and understandable. This code has been shared with group 5678
     let partToCopy; //we first pick which part of the snake to Copy
     if (this.#body.length > 0) {
       partToCopy = this.#body[this.#body.length - 1]; // So if the snake has body parts, we copy the last one 

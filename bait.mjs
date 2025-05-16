@@ -6,7 +6,6 @@ import libSprite from "./libSprite_v2.mjs";
 import lib2D from "./lib2d_v2.mjs";
 import { GameProps, SheetData } from "./game.mjs";
 import { TBoardCell, EBoardCellInfoType } from "./gameBoard.mjs";
-
 //------------------------------------------------------------------------------------------
 //----------- Classes ---------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
@@ -51,7 +50,6 @@ export class TGoldenBait extends libSprite.TSprite {
     }while(GameProps.gameBoard.getCell(this.#boardCell.row, this.#boardCell.col).infoType !== EBoardCellInfoType.Empty);
     this.x = this.#boardCell.col * this.spi.width;
     this.y = this.#boardCell.row * this.spi.height;
-    // Update the bait cell info type to GoldenBait
     GameProps.gameBoard.getCell(this.#boardCell.row, this.#boardCell.col).infoType = EBoardCellInfoType.GoldenBait
   } // End of update
 

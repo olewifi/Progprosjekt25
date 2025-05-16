@@ -17,21 +17,21 @@ const chkMuteSound = document.getElementById("chkMuteSound");
 const snakeColour = document.getElementsByName("snakeColour");
 const cvs = document.getElementById("cvs");
 const spcvs = new libSprite.TSpriteCanvas(cvs);
-let gameSpeed = 4; //Gamespeed
+let gameSpeed = 4;
 let hndUpdateGame = null;
-let musicCounter = 153; //Counts something 
-export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 }; //Statuses of the game
+let musicCounter = 153; 
+export const EGameStatus = { Idle: 0, Playing: 1, Pause: 2, GameOver: 3 }; 
 
 // prettier-ignore
 export const SheetData = {
   Head:     { x:   0, y:   0, width:  38, height:  38, count:  4 },
   Body:     { x:   0, y:  38, width:  38, height:  38, count:  6 },
   Tail:     { x:   0, y:  76, width:  38, height:  38, count:  4 },
-  Head_2:   { x: 222, y:   0, width:  38, height:  38, count:  4 }, //Second snake colour/skin
+  Head_2:   { x: 222, y:   0, width:  38, height:  38, count:  4 }, //Extra sprites from extended sprite sheet
   Body_2:   { x: 222, y:  38, width:  38, height:  38, count:  6 }, // -||-
   Tail_2:   { x: 222, y:  76, width:  38, height:  38, count:  4 }, // -||-
   Bait:     { x:   0, y: 114, width:  38, height:  38, count:  1 },
-  Bait_2:   { x:  32, y: 114, width:  38, height:  38, count:  1 }, //Extra added Golden apple
+  Bait_2:   { x:  32, y: 114, width:  38, height:  38, count:  1 }, // -||-
   Play:     { x:   0, y: 155, width: 202, height: 202, count: 10 },
   GameOver: { x:   0, y: 647, width: 856, height: 580, count:  1 },
   Home:     { x:  65, y: 995, width: 169, height: 167, count:  1 },
@@ -48,8 +48,8 @@ export const GameProps = {
   SnakeColourSpriteHead: null,
   SnakeColourSpriteBody: null,
   SnakeColourSpriteTail: null,
-  bait: null, //Apple
-  GoldenBait: null, //Gold apple
+  bait: null,
+  GoldenBait: null,
   menu: null, 
   sounds:{food:null, running:null, gameOver:null}, 
   totalScore: 0,
@@ -65,16 +65,17 @@ export const GameProps = {
 
 export function newGame() {
   GameProps.gameBoard = new TGameBoard();
-  GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); // Initialize snake with a starting position
-  GameProps.bait = new TBait(spcvs); // Initialize bait
-  GameProps.GoldenBait = new TGoldenBait(spcvs); //initialize goldenbait
-  GameProps.GoldenBait.visible = false; //makes the golden apple not visible at start
-  gameSpeed = 4; // Reset gamespeed
-  GameProps.totalScore = 0; //Resets totalscore
-  GameProps.baitScore = 50; //Resets bait score
-  GameProps.GoldenBaitCountdown = 30; //resets the countdown for golden apple to disappear
-  GameProps.BaitsEatenCounter = 0; //Resets golden apple spawner for a new game if player dies while the golden apple counter is active
-  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //Updates the scores value befor we show them
+  GameProps.snake = new TSnake(spcvs, new TBoardCell(5, 5)); 
+  GameProps.bait = new TBait(spcvs); 
+  GameProps.GoldenBait = new TGoldenBait(spcvs); 
+  GameProps.GoldenBait.visible = false; 
+  //Reset
+  gameSpeed = 4; 
+  GameProps.totalScore = 0;
+  GameProps.baitScore = 50;
+  GameProps.GoldenBaitCountdown = 30;
+  GameProps.BaitsEatenCounter = 0;
+  GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); //Updates the score value
 
   setSoundOnOff(); //When new game, check if sound is muted
   GameProps.gameStatus = EGameStatus.Playing; 
@@ -85,7 +86,7 @@ export function newGame() {
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
 }
 
-export function startMusic() { //Gjør noe annet spesifikt
+export function startMusic() { 
   // Resets music
   if (!GameProps.soundMuted) {
     GameProps.sounds.running.stop();
@@ -93,7 +94,7 @@ export function startMusic() { //Gjør noe annet spesifikt
     console.log("Music playing"); 
 
     clearInterval();
-    setInterval(() => {
+    setInterval(() => {//timer so that the music replays correctly
        if(GameProps.gameStatus != EGameStatus.GameOver && GameProps.gameStatus != EGameStatus.Idle) {
         musicCounter--;
       }
@@ -102,7 +103,7 @@ export function startMusic() { //Gjør noe annet spesifikt
         GameProps.sounds.running.play(); 
         musicCounter = 153;
       }
-    }, 1000); // 2.33 minutes in milliseconds
+    }, 1000);
   }
 }
 
@@ -111,19 +112,19 @@ export function bateIsEaten() {
   console.log("Bait eaten!");
   GameProps.sounds.food.stop(); //Must stop the music to reset, or else it will not play
   if(!GameProps.soundMuted){
-  GameProps.sounds.food.play(); //Plays when not muted 
+  GameProps.sounds.food.play();
   }
 
-  increaseGameSpeed(); // Increases gamespeed when bait is eaten
-  GameProps.snake.addSnakePart(); //Increases snake size when bait is eaten
-  GameProps.totalScore += GameProps.baitScore; //Increases score when bait is eaten
-  GameProps.baitScore = 50;  //Resetting baitscore
-  GameProps.bait.update();  //Moves bait to a new randomized spot
-  //console.log("There is: " + GameProps.BaitsEatenCounter + " baits eaten"); //console.log for seeing baitsEatenCounter and when the golden apple spawned
-  //console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore); //console.log for testing scores before spscores and menu
+  increaseGameSpeed();
+  GameProps.snake.addSnakePart();
+  GameProps.totalScore += GameProps.baitScore;
+  GameProps.baitScore = 50;
+  GameProps.bait.update();
+  //console.log("There is: " + GameProps.BaitsEatenCounter + " baits eaten");
+  //console.log("The bait score is: " + GameProps.baitScore + " Totalscore: " + GameProps.totalScore);
 }
 
-export function GoldBaitIsEaten() { //It's alike "bateisEaten()" so we will not repeat the same comments
+export function GoldBaitIsEaten() {
   GameProps.sounds.food.stop();
   if(!GameProps.soundMuted){
   GameProps.sounds.food.play(); 
@@ -131,7 +132,7 @@ export function GoldBaitIsEaten() { //It's alike "bateisEaten()" so we will not 
   increaseGameSpeed(); 
   GameProps.snake.addSnakePart(); 
 
-  GameProps.totalScore += GameProps.GoldenBaitScore; //adds GoldenBaitScore to total score
+  GameProps.totalScore += GameProps.GoldenBaitScore;
   GameProps.GoldenBaitCountdown = 30; //Resets countdown every time the golden apple is eaten
   GameProps.GoldenBait.visible = false; //makes it invisible after it's eaten so that you can't see the next location
 }
@@ -145,11 +146,11 @@ function loadGame() {
   cvs.width = GameBoardSize.Cols * SheetData.Head.width;
   cvs.height = GameBoardSize.Rows * SheetData.Head.height;
 
-  GameProps.gameStatus = EGameStatus.Idle; // Gamestatus loads in idle
-  GameProps.menu = new TMenu(spcvs); //Initialize menu
+  GameProps.gameStatus = EGameStatus.Idle; 
+  GameProps.menu = new TMenu(spcvs);
 
-  GameProps.menu.hideStuff(); //Hides everything except play when the game loads in
-  requestAnimationFrame(drawGame); //animates the game
+  GameProps.menu.hideStuff(); //Hides the sprites we don't want to see yet
+  requestAnimationFrame(drawGame); 
   setSnakeColour(); //Loads in which snakecolour has been chosen
   
   console.log("Game canvas is rendering!");
@@ -193,7 +194,7 @@ function updateGame() {
   // Update game logic here
   switch (GameProps.gameStatus) {
     case EGameStatus.Idle:
-      document.getElementsByName("snakeColour").forEach((el) => el.disabled = false); // Re-enables snakcoulours
+      document.getElementsByName("snakeColour").forEach((el) => el.disabled = false); // Re-enables snakcolours
       break; 
 
     case EGameStatus.Playing:
@@ -201,37 +202,37 @@ function updateGame() {
         GameProps.gameStatus = EGameStatus.GameOver;
         console.log("Game over!");
          if (!GameProps.soundMuted) {
-          GameProps.sounds.gameOver.stop(); //Stopping the music to reset it, or else it will not play
-          GameProps.sounds.gameOver.play(); // Plays the game over sound
+          GameProps.sounds.gameOver.stop();
+          GameProps.sounds.gameOver.play(); 
         } 
-        GameProps.sounds.running.stop(); //Stops the playing sound
-        GameProps.menu.gameOver();  //UHM Sjekk gameOver()
+        GameProps.sounds.running.stop();
+        GameProps.menu.gameOver();
         }
         document.getElementsByName("snakeColour").forEach((el) => el.disabled = true); // It loops through and disables all snakecolour radio buttons during game 
-      if(GameProps.BaitsEatenCounter === 7){ //Spawns the Golden apple after snake has eaten 7 apples
+
+      if(GameProps.BaitsEatenCounter === 7){ //Spawns the Golden apple when 7th apple is eaten
         GameProps.BaitsEatenCounter = 0; //Resets the counter in game, if not the Golden apple will dance around the gameboard
         GameProps.GoldenBait.update(); //Moves the Apple to a new spot
         GameProps.GoldenBait.visible = true; //Shows the Golden Apple
         console.log("Golden apple has spawned");
       }else if(GameProps.GoldenBaitCountdown === 0){ //If snake does not eat golden apple in time it will disappear
-        GameProps.GoldenBait.visible = false; //Makes the golden apple invisible
+        GameProps.GoldenBait.visible = false;
         GameProps.GoldenBaitCountdown = 30; //Resets the countdown
       }
       GameProps.menu.updateScore(GameProps.baitScore, GameProps.totalScore); 
       document.getElementsByName("snakeColour").disabled = true;  
-
       break;
 
     case EGameStatus.GameOver:
       GameProps.sounds.running.stop();
-      document.getElementsByName("snakeColour").forEach((el) => el.disabled = false); // Re-enables snakcoulours
+      document.getElementsByName("snakeColour").forEach((el) => el.disabled = false); // Re-enables snakcolours
       break;
   }
 }
 
 function increaseGameSpeed() {
-   gameSpeed += 0.5; //adding speed
-  console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
+   gameSpeed += 0.5;
+  //console.log("Increased game speed! Gamespeed is currently: " + gameSpeed);
   clearInterval(hndUpdateGame); 
   hndUpdateGame = setInterval(updateGame, 1000 / gameSpeed); 
 }
@@ -239,7 +240,6 @@ function increaseGameSpeed() {
 //-----------------------------------------------------------------------------------------
 //----------- Event handlers --------------------------------------------------------------
 //-----------------------------------------------------------------------------------------
-
 
 function setSoundOnOff() { //Reused from Flappybird, checks if the sound is muted or not 
   if (chkMuteSound.checked) {
@@ -250,13 +250,13 @@ function setSoundOnOff() { //Reused from Flappybird, checks if the sound is mute
     GameProps.soundMuted = false;
      if((GameProps.gameStatus === EGameStatus.Playing || GameProps.gameStatus === EGameStatus.Pause) && 
       (GameProps.gameStatus !== EGameStatus.Idle || GameProps.gameStatus !== EGameStatus.GameOver)){
-       GameProps.sounds.running.play(); //Starts the music only when one is playing the game, it restarts when you mute/unmute it
+       GameProps.sounds.running.play();
     }
     console.log("Sound on");
   }
 } // end of setSoundOnOff
 
-function setSnakeColour(){
+function setSnakeColour(){ //Uses a variable that will change the snake colour to either green or purple
   if(snakeColour[0].checked){
     GameProps.SnakeColourSpriteHead = SheetData.Head;
     GameProps.SnakeColourSpriteBody = SheetData.Body;
@@ -266,7 +266,7 @@ function setSnakeColour(){
     GameProps.SnakeColourSpriteHead = SheetData.Head_2;
     GameProps.SnakeColourSpriteBody = SheetData.Body_2;
     GameProps.SnakeColourSpriteTail = SheetData.Tail_2;
-    console.log("Snake is purble");
+    console.log("Snake is purple");
   }
 }
 
