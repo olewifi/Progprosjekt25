@@ -76,7 +76,7 @@ class TSnakeHead extends TSnakePart {
     //Check if the snake head is on a snake cell
     const boardCellInfo = GameProps.gameBoard.getCell(this.boardCell.row, this.boardCell.col);
     if(boardCellInfo.infoType === EBoardCellInfoType.Bait) {
-      GameProps.BaitEatenCounter++;
+      GameProps.BaitsEatenCounter++;
       bateIsEaten();
     }else{
       /* Decrease the score if the snake head is not on a bait cell */

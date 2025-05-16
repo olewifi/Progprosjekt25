@@ -178,8 +178,6 @@ togglePause(){ //toggler pause and music
   } else if(GameProps.gameStatus === EGameStatus.Pause) {
     GameProps.gameStatus = EGameStatus.Playing;
     GameProps.sounds.running;
-    GameProps.isRunningSoundPlaying = true;
-    GameProps.sounds.running.play(); 
   }
   this.#spButtonPause.visible = GameProps.gameStatus === EGameStatus.Pause;
   } 
